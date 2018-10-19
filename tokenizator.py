@@ -136,19 +136,17 @@ class Tokenizator(object):
         tp_of_c=self.tokens_type_definition(strim[0])
         for i,c in enumerate(strim):  # i is a number c is a letter
             # here it's just checks if types are equal
-            if self.tokens_type_definition(c) != tp_of_c and i>0:
-                tp = self.tokens_type_definition(strim[i-1])
+            if i>0 and self.tokens_type_definition(c) != tp_of_c :
+                tp =  tp_of_c
                 tp_of_c = self.tokens_type_definition(c)
                 s = strim[position:i]
                 position = i
                 t = Token_Type(s,tp)                        
-                yield(t)    
-        # last if for the very last substring in strim        
-        if self.tokens_type_definition(c):
-            tp = self.tokens_type_definition(c)
-            s = strim[position:i+1]
-            t = Token_Type(s,tp)
-            yield(t)        
+                yield(t)           
+        tp = self.tokens_type_definition(c)
+        s = strim[position:i+1]
+        t = Token_Type(s,tp)
+        yield(t)        
     
 if __name__ == '__main__':
     x=Tokenizator()
