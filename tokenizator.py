@@ -1,3 +1,4 @@
+import unicodedata
 """
 Tokenizator
 This module performs the morphological analyses of a text and extracts tokens.
@@ -149,8 +150,11 @@ class Tokenizator(object):
             t = Token_Type(s,tp)
             yield(t)        
     
-x=Tokenizator()
-for i in x.tokens_generator(' Ф 12 !!! @ # Alina is a student)))'):
-    print(i)
+if __name__ == '__main__':
+    x=Tokenizator()
+    for i in x.tokens_generator_plus_type_optimized(' Ф 12 !!! @ # Alina is a student)))'):
+        print(i)
+
+
 
 
