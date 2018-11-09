@@ -7,9 +7,6 @@ class TestMyCode(unittest.TestCase):
     
     def setUp(self):
         self.x = Indexer('database')
-       ''' file = open('testfile.txt', 'w') # there the file is created
-        file.write('Alina is a student')
-        file.close()''' # надо это здесь писать?
         
     def test_MyError_notFile(self):
         with self.assertRaises(ValueError):
@@ -49,27 +46,21 @@ class TestMyCode(unittest.TestCase):
         # for current directory use '.'
         file_list = os.listdir(path=".")
         base_dict = dict(shelve.open('database.'))
-        cool_result = {' ':{'testfile.txt':[Position(0,1)]},
+        cool_result = {' ':{'testfile.txt':[Position(0,1),Position(2,3),Position(5,6),Position(9,10),Position(11,12),
+                                           Position(13,14),Position(19,20),Position(22,23),Position(24,25)]},
                        'Ф':{'testfile.txt':[Position(1,2)]},
-                       ' ':{'testfile.txt':[Position(2,3)]},
                        '12':{'testfile.txt':[Position(3,5)]},
-                       ' ':{'testfile.txt':[Position(5,6)]},
-                       '!!!':{'testfile.txt':[Position(6,3)]},
-                       ' ':{'testfile.txt':[Position(6,7)]},
-                       '@':{'testfile.txt':[Position(7,8)]},
-                       ' ':{'testfile.txt':[Position(8,9)]},
-                       '#':{'testfile.txt':[Position(9,10)]},
-                       'Alina':{'testfile.txt':[Position(10,15)]},
-                       ' ':{'testfile.txt':[Position(15,16)]},
-                       'is':{'testfile.txt':[Position(16,18)]},
-                       ' ':{'testfile.txt':[Position(18,19)]},
-                       'a':{'testfile.txt':[Position(19,20)]},
-                       ' ':{'testfile.txt':[Position(20,21)]},
-                       'student':{'testfile.txt':[Position(21,28)]},
-                       ')))':{'testfile.txt':[Position(28,31)]
+                       '!!!':{'testfile.txt':[Position(6,9)]},
+                       '@':{'testfile.txt':[Position(10,11)]},
+                       '#':{'testfile.txt':[Position(12,13)]},
+                       'Alina':{'testfile.txt':[Position(14,19)]},
+                       'is':{'testfile.txt':[Position(20,22)]},
+                       'a':{'testfile.txt':[Position(23,24)]},
+                       'student':{'testfile.txt':[Position(25,32)]},
+                       ')))':{'testfile.txt':[Position(32,35)]
                       } # perfect dictionary                                                      
         self.assertEqual(base_dict,cool_result)
-        os.remove(file)
+        os.remove(test_file)
         database_exists = False
         for i in file_list:
             if i.startswith('database') and i == 'database':
@@ -90,22 +81,23 @@ class TestMyCode(unittest.TestCase):
         self.x.get_index('testfile_2.txt')                                                              
         # for current directory use '.'
         file_list = os.listdir(path=".")                                                   
-        base_dict_one = dict(shelve.open('database.'))
-        cool_result_one = {' ':{'testfile.txt':[Position(0,1)]},{'Ф':{'testfile.txt':[Position(1,2)]},
-                       {' ':{'testfile.txt':[Position(2,3)]},{'12':{'testfile.txt':[Position(3,5)]},
-                       {' ':{'testfile.txt':[Position(5,6)]},{'!!!':{'testfile.txt':[Position(6,3)]},
-                       {' ':{'testfile.txt':[Position(6,7)]},{'@':{'testfile.txt':[Position(7,8)]},
-                       {' ':{'testfile.txt':[Position(8,9)]},{'#':{'testfile.txt':[Position(9,10)]},
-                       {'Alina':{'testfile.txt':[Position(10,15)]},{' ':{'testfile.txt':[Position(15,16)]},
-                       {'is':{'testfile.txt':[Position(16,18)]},{' ':{'testfile.txt':[Position(18,19)]},
-                       {'a':{'testfile.txt':[Position(19,20)]},{' ':{'testfile.txt':[Position(20,21)]},
-                       {'student':{'testfile.txt':[Position(21,28)]},{')))':{'testfile.txt':[Position(28,31)]} # perfect dictionary 
+        base_dict = dict(shelve.open('database.'))
+        cool_result = {' ':{'testfile_1.txt':[Position(0,1),Position(2,3),Position(5,6),Position(9,10),Position(11,12),
+                                           Position(13,14),Position(19,20),Position(22,23),Position(24,25)]},
+                       'Ф':{'testfile_1.txt':[Position(1,2)]},
+                       '12':{'testfile_1.txt':[Position(3,5)]},
+                       '!!!':{'testfile_1.txt':[Position(6,9)]},
+                       '@':{'testfile_1.txt':[Position(10,11)]},
+                       '#':{'testfile_1.txt':[Position(12,13)]},
+                       'Alina':{'testfile_1.txt':[Position(14,19)],{'testfile_2.txt':[Position(0,5)]},
+                       'is':{'testfile_1.txt':[Position(20,22)]},
+                       'a':{'testfile_1.txt':[Position(23,24)]},
+                       'student':{'testfile_1.txt':[Position(25,32)]},
+                       ')))':{'testfile_1.txt':[Position(32,35)]
+                      } # perfect dictionary    
         self.assertEqual(base_dict,cool_result)                                                              
         os.remove(file_one)
-        base_dict_two = dict(shelve.open('database.'))
-        cool_result_two = {'Alina':{'testfile.txt':[Position(0,5)]}} # perfect dictionary element
-        self.assertEqual(base_dict_two,cool_result_two)
-        os.remove(file_two) 
+        os.remove(file_two)                                                             
         database_exists = False
         for i in file_list:
             if i.startswith('database') and i == 'database':
