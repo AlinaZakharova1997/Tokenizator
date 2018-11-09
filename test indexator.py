@@ -69,7 +69,7 @@ class TestMyCode(unittest.TestCase):
         self.assertEqual(base_dict,cool_result)
         os.remove(file)
                                                                       
-  def test_many_files(self):
+  def test_many_files (self):
         file_one = open('testfile_1.txt', 'w') 
         file_one.write(' Ф 12 !!! @ # Alina is a student)))')
         file_one.close()
