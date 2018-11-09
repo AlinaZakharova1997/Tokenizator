@@ -25,15 +25,15 @@ class TestMyCode(unittest.TestCase):
         file.close()
         self.x.get_index('testfile.txt')
         # for current directory use '.'
-        file_list= os.listdir(path=".")
-        assert_true=False
+        file_list = os.listdir(path = ".")
+        assert_true = False
         for i in file_list:
             if i startswith('database'):
-               assert_true= True
+               assert_true = True
             elif i startswith('database.'):
-                assert_true= True
+                assert_true = True
             else:
-                assert_true= False
+                assert_true = False
         self.assertEqual(assert_true, True)
         base_dict = dict(shelve.open('database.'))
         cool_result = {'Alina':{'testfile.txt':[Position(0,5)]}} # perfect dictionary element
@@ -46,15 +46,15 @@ class TestMyCode(unittest.TestCase):
         file.close()
         self.x.get_index('testfile.txt')
         # for current directory use '.'
-        file_list= os.listdir(path=".")
-        assert_true=False
+        file_list = os.listdir(path=".")
+        assert_true = False
         for i in file_list:
             if i startswith('database'):
-               assert_true= True
+               assert_true = True
             elif i startswith('database.'):
-                assert_true= True
+                assert_true = True
             else:
-                assert_true= False
+                assert_true = False
         self.assertEqual(assert_true, True)
         base_dict = dict(shelve.open('database.'))
         cool_result = {' ':{'testfile.txt':[Position(0,1)]},{'Ф':{'testfile.txt':[Position(1,2)]},
@@ -79,22 +79,22 @@ class TestMyCode(unittest.TestCase):
         self.x.get_index('testfile_1.txt')
         self.x.get_index('testfile_2.txt')                                                              
         # for current directory use '.'
-        file_list= os.listdir(path=".")
-        assert_true=False
+        file_list = os.listdir(path=".")
+        assert_true = False
         for i in file_list:
             if i startswith('database_one'):
-               assert_true= True
+               assert_true = True
             elif i startswith('database_one.'):
-                assert_true= True                                                          
+                assert_true = True                                                          
             else:
-                assert_true= False
+                assert_true = False
         self.assertEqual(assert_true, True)
             if i  startswith('database_two'):
-               assert_true= True
+               assert_true = True
             elif i startswith('database_two.'):
-                assert_true= True                                                          
+                assert_true = True                                                          
             else:
-                assert_true= False
+                assert_true = False
         self.assertEqual(assert_true, True)                                                       
         base_dict_one = dict(shelve.open('database.'))
         cool_result_one = {' ':{'testfile.txt':[Position(0,1)]},{'Ф':{'testfile.txt':[Position(1,2)]},
