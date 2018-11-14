@@ -3,6 +3,8 @@ import os
 import indexer
 import shelve
 from indexer import Indexer
+
+
 class TestMyCode(unittest.TestCase):
     
     def setUp(self):
@@ -21,18 +23,19 @@ class TestMyCode(unittest.TestCase):
         test_file.write('Alina')
         test_file.close()
         self.x.get_index('testfile.txt')
+        def __del__(self):
+            del'database'
         # for current directory use '.'
-        file_list = os.listdir(path = ".")
-        self.assertEqual(database_exists, True)
+        file_list = os.listdir(path=".")
         base_dict = dict(shelve.open('database'))
-        cool_result = {'Alina':{'testfile.txt':[Position(0,5)]}} # perfect dictionary element
-        self.assertEqual(base_dict,cool_result)
+        cool_result = {'Alina':{'testfile.txt':[Position(0,5)]}}  # perfect dictionary element
+        self.assertEqual(base_dict, cool_result)
         os.remove(test_file)
         database_exists = False
         for i in file_list:
-            if i.startswith('database') and i == 'database':
-              database_exists = True
-            os.remove(i)
+            if i == 'database':
+                database_exists = True
+                os.remove(i)
             elif i.startswith('database.'):
                 database_exists= True
                 os.remove(i)
@@ -43,6 +46,8 @@ class TestMyCode(unittest.TestCase):
         test_file.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file.close()
         self.x.get_index('testfile.txt')
+        def __del__(self):
+            del'database'
         # for current directory use '.'
         file_list = os.listdir(path=".")
         base_dict = dict(shelve.open('database.'))
@@ -59,16 +64,16 @@ class TestMyCode(unittest.TestCase):
                        'student':{'testfile.txt':[Position(25,32)]},
                        ')))':{'testfile.txt':[Position(32,35)]
                       } # perfect dictionary                                                      
-        self.assertEqual(base_dict,cool_result)
+        self.assertEqual(base_dict, cool_result)
         os.remove(test_file)
         database_exists = False
         for i in file_list:
-            if i.startswith('database') and i == 'database':
-              database_exists = True
-            os.remove(i)
+            if i == 'database':
+                       database_exists = True
+                       os.remove(i)
             elif i.startswith('database.'):
-                database_exists= True
-                os.remove(i)               
+                       database_exists= True
+                       os.remove(i)               
                                                                       
   def test_many_files (self):
         file_one = open('testfile_1.txt', 'w') 
@@ -78,7 +83,9 @@ class TestMyCode(unittest.TestCase):
         file_two.write('Alina')
         file_two.close()                                            
         self.x.get_index('testfile_1.txt')
-        self.x.get_index('testfile_2.txt')                                                              
+        self.x.get_index('testfile_2.txt') 
+        def __del__(self):
+            del'database'               
         # for current directory use '.'
         file_list = os.listdir(path=".")                                                   
         base_dict = dict(shelve.open('database.'))
@@ -100,12 +107,12 @@ class TestMyCode(unittest.TestCase):
         os.remove(file_two)                                                             
         database_exists = False
         for i in file_list:
-            if i.startswith('database') and i == 'database':
-              database_exists = True
-            os.remove(i)
+            if i == 'database':
+                                database_exists = True
+                                os.remove(i)
             elif i.startswith('database.'):
-                database_exists= True
-                os.remove(i)                                                                    
+                                database_exists= True
+                                os.remove(i)                                                                    
             
 if __name__ == '__main__':
     unittest.main()        
