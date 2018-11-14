@@ -8,23 +8,22 @@ from indexer import Indexer
 class TestMyCode(unittest.TestCase):
     
     def setUp(self):
-        self.x = Indexer('database')
+        self.indexator = Indexer('database')
         
     def test_MyError_notFile(self):
         with self.assertRaises(ValueError):
-            self.x.get_index(12)
+            self.indexator.get_index(12)
           
     def test_if_file_exists(self):
         with self.assertRaises(ValueError):
-            self.x.get_index('None.txt')
+            self.indexator.get_index('None.txt')
           
     def test_database_one_token(self):
         test_file = open('testfile.txt', 'w') 
         test_file.write('Alina')
         test_file.close()
-        self.x.get_index('testfile.txt')
-        def __del__(self):
-            del'database'
+        self.indexator.get_index('testfile.txt')
+        del 'database'
         # for current directory use '.'
         file_list = os.listdir(path=".")
         base_dict = dict(shelve.open('database'))
@@ -45,9 +44,8 @@ class TestMyCode(unittest.TestCase):
         test_file = open('testfile.txt', 'w') 
         test_file.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file.close()
-        self.x.get_index('testfile.txt')
-        def __del__(self):
-            del'database'
+        self.indexator.get_index('testfile.txt')
+        del 'database'
         # for current directory use '.'
         file_list = os.listdir(path=".")
         base_dict = dict(shelve.open('database.'))
@@ -84,8 +82,7 @@ class TestMyCode(unittest.TestCase):
         file_two.close()                                            
         self.x.get_index('testfile_1.txt')
         self.x.get_index('testfile_2.txt') 
-        def __del__(self):
-            del'database'               
+        del 'database'                
         # for current directory use '.'
         file_list = os.listdir(path=".")                                                   
         base_dict = dict(shelve.open('database.'))
@@ -102,7 +99,7 @@ class TestMyCode(unittest.TestCase):
                        'student':{'testfile_1.txt':[Position(25,32)]},
                        ')))':{'testfile_1.txt':[Position(32,35)]
                       } # perfect dictionary    
-        self.assertEqual(base_dict,cool_result)                                                              
+        self.assertEqual(base_dict, cool_result)                                                              
         os.remove(file_one)
         os.remove(file_two)                                                             
         database_exists = False
