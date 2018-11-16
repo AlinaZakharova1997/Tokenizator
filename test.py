@@ -89,6 +89,30 @@ class TestMyCode(unittest.TestCase):
         s=[1, 2, 3, 'this is my string']
         with self.assertRaises(ValueError):
             self.x.tokenize(s)
+   
+    def test_isgenerator_for_token_gen(self):
+        result = self.x.token_gen(' Ф 12 !!! @ # Alina is a student)))')
+        self.assertIsInstance(result, Generator)
+    def test_my_token_gen(self):
+        result = list(self.x.token_gen(' Ф 12 !!! @ # Alina is a student)))'))
+        self.assertIsInstance(result, list)
+        self.assertEqual(len(result), 6)
+        self.assertEqual(result[0].s, 'Ф')
+        self.assertEqual(result[0].tp, 'alpha')
+        self.assertEqual(result[0].position,2)
+        self.assertEqual(result[1].s, '12')
+        self.assertEqual(result[1].tp, 'digit')
+        self.assertEqual(result[1].position,5)
+        self.assertEqual(result[5].s,'student')
+        self.assertEqual(result[5].tp, 'alpha')
+        self.assertEqual(result[5].position,32)
+    def  test_MyError_token_gen_number(self):
+        with self.assertRaises(ValueError):
+            list(self.x.token_gen(12))
+    def test_MyError_token_gen_notList(self):
+        s=[1, 2, 3, 'this is my string']
+        with self.assertRaises(ValueError):
+            list(self.x.token_gen(s))
 
             
 if __name__ == '__main__':
