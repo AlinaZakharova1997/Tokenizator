@@ -11,7 +11,7 @@ class TestMyCode(unittest.TestCase):
         self.indexator = Indexer('database')
         
     def test_MyError_notFile(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.indexator.get_index(12)
           
     def test_if_file_exists(self):
@@ -23,7 +23,7 @@ class TestMyCode(unittest.TestCase):
         test_file.write('Alina')
         test_file.close()
         self.indexator.get_index('testfile.txt')
-        del 'database'
+        del database
         # for current directory use '.'
         file_list = os.listdir(path=".")
         base_dict = dict(shelve.open('database'))
@@ -40,12 +40,12 @@ class TestMyCode(unittest.TestCase):
                 os.remove(i)
            
         
-   def test_database_many_tokens(self):
+    def test_database_many_tokens(self):
         test_file = open('testfile.txt', 'w') 
         test_file.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file.close()
         self.indexator.get_index('testfile.txt')
-        del 'database'
+        del database
         # for current directory use '.'
         file_list = os.listdir(path=".")
         base_dict = dict(shelve.open('database.'))
@@ -61,7 +61,7 @@ class TestMyCode(unittest.TestCase):
                        'a':{'testfile.txt':[Position(23,24)]},
                        'student':{'testfile.txt':[Position(25,32)]},
                        ')))':{'testfile.txt':[Position(32,35)]
-                      } # perfect dictionary                                                      
+                      }} # perfect dictionary                                                      
         self.assertEqual(base_dict, cool_result)
         os.remove(test_file)
         database_exists = False
@@ -73,16 +73,16 @@ class TestMyCode(unittest.TestCase):
                        database_exists= True
                        os.remove(i)               
                                                                       
-  def test_many_files (self):
+    def test_many_files (self):
         file_one = open('testfile_1.txt', 'w') 
         file_one.write(' Ф 12 !!! @ # Alina is a student)))')
         file_one.close()
         file_two = open('testfile_2.txt', 'w') 
         file_two.write('Alina')
         file_two.close()                                            
-        self.x.get_index('testfile_1.txt')
-        self.x.get_index('testfile_2.txt') 
-        del 'database'                
+        self.indexator.get_index('testfile_1.txt')
+        self.indexator.get_index('testfile_2.txt') 
+        del database                
         # for current directory use '.'
         file_list = os.listdir(path=".")                                                   
         base_dict = dict(shelve.open('database.'))
@@ -93,12 +93,12 @@ class TestMyCode(unittest.TestCase):
                        '!!!':{'testfile_1.txt':[Position(6,9)]},
                        '@':{'testfile_1.txt':[Position(10,11)]},
                        '#':{'testfile_1.txt':[Position(12,13)]},
-                       'Alina':{'testfile_1.txt':[Position(14,19)],{'testfile_2.txt':[Position(0,5)]},
+                       'Alina':{'testfile_1.txt':[Position(14,19)],'testfile_2.txt':[Position(0,5)]},
                        'is':{'testfile_1.txt':[Position(20,22)]},
                        'a':{'testfile_1.txt':[Position(23,24)]},
                        'student':{'testfile_1.txt':[Position(25,32)]},
                        ')))':{'testfile_1.txt':[Position(32,35)]
-                      } # perfect dictionary    
+                      }} # perfect dictionary    
         self.assertEqual(base_dict, cool_result)                                                              
         os.remove(file_one)
         os.remove(file_two)                                                             
@@ -112,4 +112,5 @@ class TestMyCode(unittest.TestCase):
                                 os.remove(i)                                                                    
             
 if __name__ == '__main__':
-    unittest.main()        
+    unittest.main() 
+       
