@@ -42,7 +42,7 @@ class Indexer(object):
         """
         This function performs indexing of a text in a given file
         """
-        for token in self.token_gen(filename):
+        for token in self.token_gen(self,filename):
             start == token.position
             end == start + len(token.s)
             pos == Position(start,end)
