@@ -46,8 +46,8 @@ class Token_Type(Token):
         """
         The way the programm returns the final result.
         """
-        """return self.s+ '_' + self.tp"""
-        return self.s
+        return self.s+ '_' + self.tp+'_'+ str(self.position)
+        
     
     
 class Tokenizator(object):
@@ -137,13 +137,13 @@ class Tokenizator(object):
                 tp = self.tokens_type_definition(strim[i-1])
                 s = strim[position:i]
                 position = i
-                t = Token_Type(s,tp)                        
+                t = Token_Type(s,tp,position)                        
                 yield(t)
         # last if for the very last substring in strim        
         if self.tokens_type_definition(c):
             tp = self.tokens_type_definition(c)
             s = strim[position:i+1]
-            t = Token_Type(s,tp)
+            t = Token_Type(s,tp,position)
             yield(t)
             
     def tokens_generator_plus_type_optimized (self, strim):
@@ -162,11 +162,9 @@ class Tokenizator(object):
                 tp = tp_of_c
                 tp_of_c = self.tokens_type_definition(c)
                 s = strim[position:i]
+                t = Token_Type(s,tp,position)  
                 position = i
-                t = Token_Type(s,tp,position)                        
-                yield(t)    
-        # last if for the very last substring in strim        
-        '''if self.tokens_type_definition(c):'''
+                yield(t)         
         tp = self.tokens_type_definition(c)
         s = strim[position:i+1]
         t = Token_Type(s,tp,position)
