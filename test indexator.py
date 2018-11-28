@@ -38,30 +38,30 @@ class TestMyCode(unittest.TestCase):
         self.indexator.get_index('testfile.txt')
         del self.indexator
         base_dict = dict(shelve.open('database'))
-        cool_result = {'Alina':{'testfile.txt':[Position(0,5)]}}  # perfect dictionary 
+        cool_result = {'Alina': {'testfile.txt': [Position(0, 5)]}}  # perfect dictionary 
         self.assertEqual(base_dict, cool_result)
         os.remove('testfile.txt')  
         
     def test_database_many_tokens(self):
-        test_file = open('testfile_many.txt', 'w',encoding='utf-8') 
+        test_file = open('testfile_many.txt', 'w', encoding='utf-8') 
         test_file.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file.close()
         self.indexator.get_index('testfile_many.txt')
         del self.indexator
         base_dict = dict(shelve.open('database'))
         cool_result = {
-                       'Ф':{'testfile_many.txt':[Position(1,2)]},
-                       '12':{'testfile_many.txt':[Position(3,5)]},
-                       'Alina':{'testfile_many.txt':[Position(14,19)]},
-                       'is':{'testfile_many.txt':[Position(20,22)]},
-                       'a':{'testfile_many.txt':[Position(23,24)]},
-                       'student':{'testfile_many.txt':[Position(25,32)]},
+                       'Ф': {'testfile_many.txt': [Position(1, 2)]},
+                       '12': {'testfile_many.txt': [Position(3, 5)]},
+                       'Alina':{'testfile_many.txt':[Position(14, 19)]},
+                       'is':{'testfile_many.txt':[Position(20, 22)]},
+                       'a':{'testfile_many.txt':[Position(23, 24)]},
+                       'student':{'testfile_many.txt':[Position(25, 32)]},
                       }                                                      
         self.assertEqual(base_dict, cool_result)
         os.remove('testfile_many.txt')           
                                                                       
-    def test_many_files (self):
-        file_one = open('testfile_1.txt', 'w',encoding='utf-8') 
+    def test_many_files(self):
+        file_one = open('testfile_1.txt', 'w', encoding='utf-8') 
         file_one.write(' Ф 12 !!! @ # Alina is a student)))')
         file_one.close()
         file_two = open('testfile_2.txt', 'w') 
