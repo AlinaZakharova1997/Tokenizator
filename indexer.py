@@ -15,27 +15,37 @@ class Position(object):
     @param end: position on the last element of a token
     """
 
-    def __init__(self, start, end):
+    def __init__(self,start,end):
         
         self.start = start
         self.end = end
+        
+    def __eq__(self,position):
 
+        return self.start == position.start and self.end == position.end
+
+    def __repr__(self):
+
+        return str(self.start) + ',' + str(self.end)
           
 class Indexer(object):
 
-    def __init__(self, database):
+    def __init__(self,database):
         """
-        Constructor for a database
+        Constructor for an database
         @param database: element of Indexer,
         contains a dictionary where token is a key,
         and a value is a dictionary where the key is filename,
         and the value is a list of positions
         """
-        self.database = shelve.open(database)
+        self.database = shelve.open(database,writeback=True)
+        self.tokenizator = Tokenizator()
+
 
     def __del__(self):
         self.database.close()
         
+
     def get_index(self,filename):
         """
         This function performs indexing of a text in a given file
@@ -49,9 +59,6 @@ class Indexer(object):
             pos = Position(start,end)
             self.database.setdefault(token.s,{}).setdefault(filename,[]).append(pos)
         my_file.close()    
-            
-
-            
             
 
 
