@@ -105,5 +105,5 @@ class Indexer(object):
                 end = start + len(token.s)
                 pos = Position_Plus(lnumber,start,end)
                 self.database.setdefault(token.s,{}).setdefault(filename,[]).append(pos)
-                lnumber+=1
+            lnumber+=1
         my_file.close() 
