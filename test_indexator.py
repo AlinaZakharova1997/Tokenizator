@@ -83,15 +83,15 @@ class TestMyCode(unittest.TestCase):
         os.remove('testfile_2.txt')                                                             
                                                                           
     def test_lines(self):
-        file_line = open ('testfile_line.txt','w', encoding='utf-8')
-        file_line.write(' Ф 12 !!! @ # Alina is a student))) \r\n Alina likes apples 1997 \r\n')
+        file_line = open ('testfile_line.txt','w')
+        file_line.write(' Ф 12 !!! @ # Alina is a student))) \n Alina likes apples 1997\n\n')
         file_line.close()
         self.indexator.get_index_with_line('testfile_line.txt')
         del self.indexator                                                                 
         base_dict = dict(shelve.open('database'))
         cool_result = {'Ф': {'testfile_line.txt': [Position_Plus(0, 1, 2)]},
                        '12': {'testfile_line.txt': [Position_Plus(0, 3, 5)]},
-                       'Alina': {'testfile_line.txt': [Position_Plus(0, 14, 19)],'testfile_line.txt': [Position_Plus(1, 1, 6)]},
+                       'Alina': {'testfile_line.txt': [Position_Plus(0, 14, 19),Position_Plus(1, 1, 6)]},
                        'is': {'testfile_line.txt': [Position_Plus(0, 20, 22)]},
                        'a': {'testfile_line.txt': [Position_Plus(0, 23, 24)]},
                        'student': {'testfile_line.txt': [Position_Plus(0, 25, 32)]},
