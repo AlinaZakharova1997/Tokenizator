@@ -9,18 +9,19 @@ from indexer import Indexer, Position_Plus
 class TestMyCode(unittest.TestCase):
     
     def setUp(self):
-        self.database = SearchEngine()
+        self.database = SearchEngine('database')
+        self.indexator = Indexer('database')
         self.maxDiff = None
 
     def test_MyError_give_dict_inp(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.database.get_dict(12)
             
     def test_get_dict(self):
         test_file = open('test_search_one.txt', 'w',encoding='utf-8') 
         test_file.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file.close()
-        self.indexator.get_index('test_search_one.txt.txt')
+        self.indexator.get_index('test_search_one.txt')
         del self.indexator
         database = dict(shelve.open('database'))
         self.database.get_dict('Alina')
