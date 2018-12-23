@@ -103,7 +103,29 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_search_one.txt')
         os.remove('test_search_two.txt')
         os.remove('test_search_three.txt')
-
+   def test_dict_many_files(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_search_one.txt', 'w') 
+        test_file_one.write(' Ф 12 !!! @ # Alina is a student)))')
+        test_file_one.close()
+        test_file_two = open('test_search_two.txt', 'w') 
+        test_file_two.write(' Ф 12 !!! @ # Alina loves apples)))')
+        test_file_two.close()
+        test_file_three = open('test_search_three.txt', 'w') 
+        test_file_three.write(' Ф 12 !!! @ # Alina student)))')
+        test_file_three.close()
+        self.indexator.get_index_with_line('test_search_one.txt')
+        self.indexator.get_index_with_line('test_search_two.txt')
+        self.indexator.get_index_with_line('test_search_three.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        result = self.search.get_dict_many_tokens('Alina student')
+        cool_result = {'test_search_one.txt': [Position_Plus(0,14,19),Position_Plus(0,25,32)],
+                       'test_search_three.txt':[Position_Plus(0,14,19),Position_Plus(0,20,27)]}
+        self.assertEqual(result, cool_result)
+        os.remove('test_search_one.txt')
+        os.remove('test_search_two.txt')
+        os.remove('test_search_three.txt')
 
         
 if __name__ == '__main__':
