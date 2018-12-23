@@ -11,9 +11,11 @@ class TestMyCode(unittest.TestCase):
     
     def setUp(self):
         self.maxDiff = None
+        self.indexator = Indexer('database')
 
     def tearDown(self):
-        del self.search
+        if hasattr(self, 'search'):
+            del self.search
         # for current directory use '.'
         file_list = os.listdir(path=".")
         for i in file_list:
@@ -52,14 +54,14 @@ class TestMyCode(unittest.TestCase):
         self.search = SearchEngine('database')
         result = self.search.get_dict('Laptop')
         os.remove('test_search_one.txt')
-        
+
     def test_MyError_dive_dict_many_tokens_inp(self):
-       self.search = SearchEngine('database')
+        self.search = SearchEngine('database')
         with self.assertRaises(TypeError):
             self.search.get_dict_many_tokens(12)
 
     def test_get_dict_many_tokens(self):
-       self.indexator = Indexer('database')
+        self.indexator = Indexer('database')
         test_file_one = open('test_search_one.txt', 'w') 
         test_file_one.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file_one.close()
@@ -67,7 +69,7 @@ class TestMyCode(unittest.TestCase):
         test_file_two.write(' Ф 12 !!! @ # Alina loves apples)))')
         test_file_two.close()
         test_file_three = open('test_search_three.txt', 'w') 
-        test_file_three.write(' Ф 12 !!! @ # Alina ££ student)))')
+        test_file_three.write(' Ф 12 !!! @ # Alina student)))')
         test_file_three.close()
         self.indexator.get_index_with_line('test_search_one.txt')
         self.indexator.get_index_with_line('test_search_two.txt')
@@ -90,7 +92,7 @@ class TestMyCode(unittest.TestCase):
         test_file_two.write(' Ф 12 !!! @ # Alina loves apples)))')
         test_file_two.close()
         test_file_three = open('test_search_three.txt', 'w') 
-        test_file_three.write(' Ф 12 !!! @ # Alina ££ student)))')
+        test_file_three.write(' Ф 12 !!! @ # Alina student)))')
         test_file_three.close()
         self.indexator.get_index_with_line('test_search_one.txt')
         self.indexator.get_index_with_line('test_search_two.txt')
@@ -102,5 +104,8 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_search_two.txt')
         os.remove('test_search_three.txt')
 
+
+        
 if __name__ == '__main__':
-    unittest.main()      
+    unittest.main()        
+
