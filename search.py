@@ -52,33 +52,15 @@ class SearchEngine(object):
             raise TypeError('Input has an unappropriate type!')
        
         big_dict_files = []
-        values = []
-        
         for token in self.tokenizator.token_gen(tok_str):
-            big_dict_files.append(self.get_dict(token.s))
-            values.append((self.get_dict(token.s)).values())
-        print(values)    
+            big_dict_files.append(self.get_dict(token.s))#выделяем токены и зап-ем в список
+            
         files = set(big_dict_files[0])    
         for file_dict in big_dict_files[1:]:
-            files = files.intersection(set(file_dict)) #пересечение файлов
-            
-        allpos = [values[0]]
-        for filepos in values[1:]:
-            allpos = allpos + values[1:]
-            
-        allpos_new = []
-        for pos in allpos:
-            if pos not in allpos_new:
-                allpos_new.append(pos)              
-            
-        output_dict = {}    
-        for filename in files:
-            for pos in set(allpos_new):
-                output_dict.setdefault(filename,[]).extend(pos)
-        return output_dict
-        
-        
-            
+            files = files.intersection(set(file_dict)) #пересечение названия файлов
 
-            
-          
+        output_dict = {} 
+        for filename in files:
+            for token in self.tokenizator.token_gen(tok_str):
+               output_dict.setdefault(filename,[]).extend(self.database[token.s][filename])
+        return output_dict
