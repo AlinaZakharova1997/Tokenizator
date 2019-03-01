@@ -54,55 +54,55 @@ class Tokenizator(object):
     """
     Class that returns tokens
     """
-    def tokenize(self,strim):
+    def tokenize(self,stream):
         """
         This is a function.
-        @param strim:strim is a text given
+        @param stream:stream is a text given
         @return: a list of tokens from the given text
         """
-        if  not isinstance(strim,str):
+        if  not isinstance(stream,str):
             raise ValueError('Input has an unappropriate type, it should be str')
         tokensback = []
-        for i,c in enumerate(strim):  # i is a number c is a letter
+        for i,c in enumerate(stream):  # i is a number c is a letter
             # here it's just shifts to the position where token starts
-            if c.isalpha() and (not strim[i-1].isalpha() or i==0):   
+            if c.isalpha() and (not stream[i-1].isalpha() or i==0):   
                 position=i
             # here it takes section from the beginning to the end of the token
             # and adds token to the list
-            if not c.isalpha()and i>0 and strim[i-1].isalpha():   
-                s=strim[position:i]
+            if not c.isalpha()and i>0 and stream[i-1].isalpha():   
+                s=stream[position:i]
                 # constructor for token is working here
                 t=Token(position,s)                        
                 tokensback.append(t)
-        # last if for the very last substring in strim        
+        # last if for the very last substring in stream        
         if c.isalpha():                   
-            s=strim[position:i+1]
+            s=stream[position:i+1]
             t=Token(position,s)
             tokensback.append(t)
         return tokensback
     
-    def tokens_generator(self, strim):
+    def tokens_generator(self, stream):
         """
         This is a generator.
-        @param strim:strim is a text given
+        @param stream:stream is a text given
         @return: tokens from the given text
         """
-        if  not isinstance(strim, str):
+        if  not isinstance(stream, str):
             raise ValueError('Input has an unappropriate type, it should be str')
-        for i,c in enumerate(strim):  # i is a number c is a letter
+        for i,c in enumerate(stream):  # i is a number c is a letter
             # here it's just shifts to the position where token starts
-            if c.isalpha() and (not strim[i-1].isalpha() or i == 0):   
+            if c.isalpha() and (not stream[i-1].isalpha() or i == 0):   
                 position = i
             # here it takes section from the beginning to the end of the token
             # and adds token to the list
-            if not c.isalpha()and i>0 and strim[i-1].isalpha():   
-                s = strim[position:i]
+            if not c.isalpha()and i>0 and stream[i-1].isalpha():   
+                s = stream[position:i]
                 # constructor for token is working here
                 t = Token(position, s)                        
                 yield(t)
-        # last if for the very last substring in strim        
+        # last if for the very last substring in stream        
         if c.isalpha():                   
-            s = strim[position:i+1]
+            s = stream[position:i+1]
             t = Token(position, s)
             yield(t)
             
@@ -122,56 +122,56 @@ class Tokenizator(object):
            tp = 'punct'
        return tp      
       
-    def tokens_generator_plus_type (self, strim):
+    def tokens_generator_plus_type (self, stream):
         """
         This is a generator.
-        @param strim:strim is a text given
+        @param stream:stream is a text given
         @return: tokens from the given text plus their type
         """
-        if  not isinstance(strim, str):
+        if  not isinstance(stream, str):
             raise ValueError('Input has an unappropriate type, it should be str')
         position=0
-        for i,c in enumerate(strim):  # i is a number c is a letter
+        for i,c in enumerate(stream):  # i is a number c is a letter
             # here it's just checks if types are equal
-            if self.tokens_type_definition(c) != self.tokens_type_definition(strim[i-1]) and i>0:
-                tp = self.tokens_type_definition(strim[i-1])
-                s = strim[position:i]
+            if self.tokens_type_definition(c) != self.tokens_type_definition(stream[i-1]) and i>0:
+                tp = self.tokens_type_definition(stream[i-1])
+                s = stream[position:i]
                 position = i
                 t = Token_Type(s,tp,position)                        
                 yield(t)
-        # last if for the very last substring in strim        
+        # last if for the very last substring in stream        
         if self.tokens_type_definition(c):
             tp = self.tokens_type_definition(c)
-            s = strim[position:i+1]
+            s = stream[position:i+1]
             t = Token_Type(s,tp,position)
             yield(t)
             
-    def tokens_generator_plus_type_optimized (self, strim):
+    def tokens_generator_plus_type_optimized (self, stream):
         """
         This is a generator.
-        @param strim:strim is a text given
+        @param stream:stream is a text given
         @return: tokens from the given text plus their type
         """
-        if  not isinstance(strim, str):
+        if  not isinstance(stream, str):
             raise ValueError('Input has an unappropriate type, it should be str')
         position=0
-        tp_of_c=self.tokens_type_definition(strim[0])
-        for i,c in enumerate(strim):  # i is a number c is a letter
+        tp_of_c=self.tokens_type_definition(stream[0])
+        for i,c in enumerate(stream):  # i is a number c is a letter
             # here it's just checks if types are equal
             if i>0 and self.tokens_type_definition(c) != tp_of_c:
                 tp = tp_of_c
                 tp_of_c = self.tokens_type_definition(c)
-                s = strim[position:i]
+                s = stream[position:i]
                 t = Token_Type(s,tp,position)  
                 position = i
                 yield(t)         
         tp = self.tokens_type_definition(c)
-        s = strim[position:i+1]
+        s = stream[position:i+1]
         t = Token_Type(s,tp,position)
         yield(t)
         
-    def token_gen (self, strim):
-        for token in self.tokens_generator_plus_type_optimized (strim):
+    def token_gen (self, stream):
+        for token in self.tokens_generator_plus_type_optimized (stream):
             if token.tp == 'alpha' or token.tp == 'digit':
                 yield(token)
 
