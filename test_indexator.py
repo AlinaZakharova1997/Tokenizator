@@ -31,7 +31,7 @@ class TestMyCode(unittest.TestCase):
             self.indexator.get_index('None.txt')
           
     def test_database_one_token(self):
-        test_file = open('testfile.txt', 'w', encoding='utf-8') 
+        test_file = open('testfile.txt', 'w') 
         test_file.write('Alina')
         test_file.close()
         self.indexator.get_index('testfile.txt')
@@ -42,7 +42,7 @@ class TestMyCode(unittest.TestCase):
         os.remove('testfile.txt')  
         
     def test_database_many_tokens(self):
-        test_file = open('testfile_many.txt', 'w', encoding='utf-8') 
+        test_file = open('testfile_many.txt', 'w') 
         test_file.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file.close()
         self.indexator.get_index('testfile_many.txt')
@@ -60,7 +60,7 @@ class TestMyCode(unittest.TestCase):
         os.remove('testfile_many.txt')           
                                                                       
     def test_many_files (self):
-        file_one = open('testfile_1.txt', 'w', encoding='utf-8') 
+        file_one = open('testfile_1.txt', 'w') 
         file_one.write(' Ф 12 !!! @ # Alina is a student)))')
         file_one.close()
         file_two = open('testfile_2.txt', 'w') 
@@ -101,7 +101,14 @@ class TestMyCode(unittest.TestCase):
                        }
         self.assertEqual(base_dict, cool_result)
         os.remove('testfile_line.txt')
-            
+
+    def emptiness(self):
+        file_line = open ('testfile_line.txt','w')
+        file_line.write('')
+        file_line.close()
+        del self.indexator
+        os.remove('testfile_line.txt')
+        
 if __name__ == '__main__':
     unittest.main() 
        
