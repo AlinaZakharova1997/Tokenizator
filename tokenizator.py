@@ -105,13 +105,14 @@ class Tokenizator(object):
             s = stream[position:i+1]
             t = Token(position, s)
             yield(t)
-            
+           
     @staticmethod
     def tokens_type_definition(x):
        """
        This is a static method, which defines a type of a token
        @return: type of a token
        """
+       tp = 'type' 
        if x.isalpha():
            tp = 'alpha'
        if x.isdigit():
@@ -154,6 +155,8 @@ class Tokenizator(object):
         """
         if  not isinstance(stream, str):
             raise ValueError('Input has an unappropriate type, it should be str')
+        if not stream:
+            yield ''
         position=0
         tp_of_c=self.tokens_type_definition(stream[0])
         for i,c in enumerate(stream):  # i is a number c is a letter
@@ -164,7 +167,7 @@ class Tokenizator(object):
                 s = stream[position:i]
                 t = Token_Type(s,tp,position)  
                 position = i
-                yield(t)         
+                yield(t)    
         tp = self.tokens_type_definition(c)
         s = stream[position:i+1]
         t = Token_Type(s,tp,position)
@@ -182,5 +185,4 @@ if __name__ == '__main__':
     x=Tokenizator()
     for i in x.token_gen(' Ф 12 !!! @ # Alina is a student)))'):
         print(i)
-
 
