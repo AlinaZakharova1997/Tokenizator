@@ -84,7 +84,7 @@ class Indexer(object):
         """
         if  not isinstance(filename, str):
             raise TypeError('Input has an unappropriate type!')
-        my_file = open(filename,encoding='utf-8')
+        my_file = open(filename)
         for token in self.tokenizator.token_gen(my_file.read()):
             start = token.position
             end = start + len(token.s)
@@ -98,8 +98,10 @@ class Indexer(object):
         """
         if  not isinstance(filename, str):
             raise TypeError('Input has an unappropriate type!')
-        my_file = open(filename, encoding='utf-8')
+        my_file = open(filename)
         for lnumber,line in enumerate(my_file):
+            if not line:
+                lnumber+=1
             for token in self.tokenizator.token_gen(line):
                 start = token.position
                 end = start + len(token.s)
