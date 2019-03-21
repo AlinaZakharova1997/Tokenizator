@@ -50,7 +50,8 @@ class SearchEngine(object):
 
         if not isinstance(tok_str, str):
             raise TypeError('Input has an unappropriate type!')
-       
+        if not tok_str:
+            return {}
         big_dict_files = []
         for token in self.tokenizator.token_gen(tok_str):
             big_dict_files.append(self.get_dict(token.s))#выделяем токены и зап-ем в список
