@@ -99,13 +99,13 @@ class TestMyCode(unittest.TestCase):
         self.assertEqual(len(result), 6)
         self.assertEqual(result[0].s, 'Ф')
         self.assertEqual(result[0].tp, 'alpha')
-        self.assertEqual(result[0].position,2)
+        self.assertEqual(result[0].position,1)
         self.assertEqual(result[1].s, '12')
         self.assertEqual(result[1].tp, 'digit')
-        self.assertEqual(result[1].position,5)
+        self.assertEqual(result[1].position,3)
         self.assertEqual(result[5].s,'student')
         self.assertEqual(result[5].tp, 'alpha')
-        self.assertEqual(result[5].position,32)
+        self.assertEqual(result[5].position,25)
     def  test_MyError_token_gen_number(self):
         with self.assertRaises(ValueError):
             list(self.x.token_gen(12))
@@ -113,7 +113,11 @@ class TestMyCode(unittest.TestCase):
         s=[1, 2, 3, 'this is my string']
         with self.assertRaises(ValueError):
             list(self.x.token_gen(s))
-
+    def test_empty_string(self):
+        result = ''
+        self.assertEqual(len(result), 0)
+                                      
+        
             
 if __name__ == '__main__':
     unittest.main()# общий способ вынести модуль чтобы запустить как прогу без импорта 
