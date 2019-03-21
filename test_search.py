@@ -27,12 +27,12 @@ class TestMyCode(unittest.TestCase):
                 os.remove(i)    
 
     def test_MyError_give_dict_inp(self):
+        del self.indexator
         self.search = SearchEngine('database')
         with self.assertRaises(TypeError):
             self.search.get_dict(12)
             
     def test_get_dict(self):
-        self.indexator = Indexer('database')
         test_file = open('test_search_one.txt', 'w') 
         test_file.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file.close()
@@ -45,7 +45,6 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_search_one.txt')
         
     def test_dict_no_such_token(self):
-        self.indexator = Indexer('database')
         test_file = open('test_search_one.txt', 'w') 
         test_file.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file.close()
@@ -56,12 +55,12 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_search_one.txt')
 
     def test_MyError_dive_dict_many_tokens_inp(self):
+        del self.indexator
         self.search = SearchEngine('database')
         with self.assertRaises(TypeError):
             self.search.get_dict_many_tokens(12)
 
     def test_get_dict_many_tokens(self):
-        self.indexator = Indexer('database')
         test_file_one = open('test_search_one.txt', 'w') 
         test_file_one.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file_one.close()
@@ -103,8 +102,8 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_search_one.txt')
         os.remove('test_search_two.txt')
         os.remove('test_search_three.txt')
-   def test_dict_many_files(self):
-        self.indexator = Indexer('database')
+        
+    def test_dict_many_files(self):
         test_file_one = open('test_search_one.txt', 'w') 
         test_file_one.write(' Ф 12 !!! @ # Alina is a student)))')
         test_file_one.close()
@@ -127,6 +126,15 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_search_two.txt')
         os.remove('test_search_three.txt')
 
+    def test_emptiness(self):
+        test_file_one = open('test_search_one.txt', 'w') 
+        test_file_one.write('')
+        test_file_one.close()
+        del self.indexator
+        os.remove('test_search_one.txt')
+        
+
+   
         
 if __name__ == '__main__':
     unittest.main()        
