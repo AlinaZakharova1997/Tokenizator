@@ -22,7 +22,7 @@ class Context_Windows(object):
     def __init__(self,string,positions,win_start,win_end):
 
         self.string = string
-        self.positions = []
+        self.positions = positions
         self.win_start = win_start
         self.win_end = win_end
         
@@ -35,7 +35,7 @@ class Context_Windows(object):
         
         return str(self.string) + ' ' + str(self.positions) + ' ' + str(self.win_start) + ' ' + str(self.win_end)
         
-    position = Position_Plus('lnumber','start','end')    
+    position = Position_Plus('lnumber','start','end')
     @classmethod
     def get_window(cls,filename,position,win_size):
         """
@@ -45,40 +45,28 @@ class Context_Windows(object):
             raise TypeError('Input has an unappropriate type!')
         cls.tokenizator = Tokenizator()
         positions = []
-        string = ""
-        string_full = ""
+        positions.append(position)
+        win_end = 0
         win_start = 0
-        win_end= 0
+        string = ""
         str_num = position.lnumber
         my_file = open(filename)
         for lnumber,my_string in enumerate(my_file):
             if lnumber == str_num:
-                string_full = my_string
+                string = my_string
                 break
-        i=0
-        for tok_num,token in enumerate(cls.tokenizator.token_gen(string_full[position.start:])):
-            if i<win_size:
-                string+=token.s+' '
-                positions.append(token.position)
-            elif i==win_size:
-                win_end = token.position
-                break
-            i+=1
- 
-        print(win_end)
-        i=0
+        
+        for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.start:])):
+            if tok_num==win_size:
+                win_end=token.position+ len(token.s)
+                break                               
         for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.end::-1])):
-            if i<win_size:
-                string+=token.s+' '
-                positions.append(token.position)    
-            elif i==win_size:
-                win_end = token.position
-                break
-            i+=1
-            
-        print(win_start)        
+
+             if tok_num==win_size:
+                win_start = token.position
+                break                               
         return cls(string,positions,win_start,win_end)
 
 if __name__ == '__main__':
     x=Context_Windows('string','positions','win_start','win_end')
-    print(x.get_window('try.txt',Position_Plus(0,14,19),1))
+    print(x.get_window('try.txt',Position_Plus(0,15,20),3))
