@@ -63,7 +63,7 @@ class Context_Windows(object):
         for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.end::-1])):
 
              if tok_num==win_size:
-                win_start = token.position
+                win_start = token.position+ len(token.s)
                 break                               
         return cls(string,positions,win_start,win_end)
 
