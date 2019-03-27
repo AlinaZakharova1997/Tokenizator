@@ -4,7 +4,7 @@ import shelve
 import tokenizator
 from tokenizator import Tokenizator
 import windows
-from windows import Context_Windows
+from windows import Context_Window
 import indexer
 from indexer import Indexer,Position_Plus
 import search
@@ -14,7 +14,8 @@ class TestMyCode(unittest.TestCase):
     
     def setUp(self):
         self.maxDiff = None
-        self.window = Context_Windows('string','positions','win_start','win_end')
+        self.window = Context_Window('string','positions','win_start','win_end')
+        self.result = Context_Window('string','positions','win_start','win_end')
 
     def tearDown(self):
         if hasattr(self, 'search'):
@@ -41,155 +42,93 @@ class TestMyCode(unittest.TestCase):
         del self.indexator
         self.search = SearchEngine('database')  
         result = self.window.get_window('test_window_one.txt',Position_Plus(0, 16, 18),1)
-        self.win = Context_Windows('string','positions','win_start','win_end')
-        self.win.string ='Zakaharova is a'
-        self.win.positions = [Position_Plus(0,6,15),Position_Plus(0,16,18),Position_Plus(0,19,20)]
-        self.win.win_start = Position_Plus(0,6,15)
-        self.win.win_end = Position_Plus(0,19,20)
+        self.win = Context_Window('string','positions','win_start','win_end')
+        self.win.string ='Alina Zakharova is a student)))'
+        self.win.positions = [Position_Plus(0,16,18)]
+        self.win.win_start = 5
+        self.win.win_end = 20
         self.assertEqual(result.string,self.win.string)
         self.assertEqual(result.positions,self.win.positions)
-        self.assertEqual(resutl.win_start,self.win.win_start)
+        self.assertEqual(result.win_start,self.win.win_start)
         self.assertEqual(result.win_end, self.win.win_end)
         self.assertEqual(result, self.win)
         os.remove('test_window_one.txt')
 
     def test_get_window_simple_plus(self):
         self.indexator = Indexer('database')
-        test_file_one = open('test_window_one.txt', 'w') 
+        test_file_one = open('test_window_two.txt', 'w') 
         test_file_one.write('Little Alina Zakharova is a linguist student)))')
         test_file_one.close()
-        self.indexator.get_index_with_line('test_window_one.txt')
+        self.indexator.get_index_with_line('test_window_two.txt')
         del self.indexator
         self.search = SearchEngine('database')  
-        result = self.window.get_window('test_window_one.txt',Position_Plus(0, 23, 24),2)
-        self.win = Context_Windows('string','positions','win_start','win_end')
-        self.win.string = 'Alina Zakharova is a linguist'
-        self.win.positions = [Position_Plus(0,7,12),Position_Plus(0,13,22),Position_Plus(0,23,24),Position_Plus(0,25,26),Position_Plus(0,27,35)]
-        self.win.win_start = Position_Plus(0,7,12)
-        self.win.win_end = Position_Plus(0,27,35)
+        result = self.window.get_window('test_window_two.txt',Position_Plus(0, 23, 25),2)
+        self.win = Context_Window('string','positions','win_start','win_end')
+        self.win.string = 'Little Alina Zakharova is a linguist student)))'
+        self.win.positions = [Position_Plus(0,23,25)]
+        self.win.win_start = 6
+        self.win.win_end = 36
         self.assertEqual(result.string,self.win.string)
         self.assertEqual(result.positions,self.win.positions)
-        self.assertEqual(resutl.win_start,self.win.win_start)
+        self.assertEqual(result.win_start,self.win.win_start)
         self.assertEqual(result.win_end, self.win.win_end)
         self.assertEqual(result, self.win)
-        os.remove('test_window_one.txt')
+        os.remove('test_window_two.txt')
         
     def test_get_window_begin(self):
         self.indexator = Indexer('database')
-        test_file_one = open('test_window_one.txt', 'w') 
-        test_file_one.write('Alina Zakharova is a student)))')
+        test_file_one = open('test_window_three.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student')
         test_file_one.close()
-        self.indexator.get_index_with_line('test_window_one.txt')
+        self.indexator.get_index_with_line('test_window_three.txt')
         del self.indexator
         self.search = SearchEngine('database')  
-        result = self.window.get_window('test_window_one.txt',Position_Plus(0, 0, 5),1)
-        self.win = Context_Windows('string','positions','win_start','win_end')
-        self.win.string = 'Alina Zakaharova'
-        self.win.positions = [Position_Plus(0, 0, 5),Position_Plus(0, 6, 15)]
-        self.win.win_start = Position_Plus(0, 0, 5)
-        self.win.win_end = Position_Plus(0, 6, 15)
+        result = self.window.get_window('test_window_three.txt',Position_Plus(0, 0, 5),2)
+        self.win = Context_Window('string','positions','win_start','win_end')
+        self.win.string = 'Alina Zakharova is a student'
+        self.win.positions = [Position_Plus(0, 0, 5)]
+        self.win.win_start = 0
+        self.win.win_end = 18
         self.assertEqual(result.string,self.win.string)
         self.assertEqual(result.positions,self.win.positions)
-        self.assertEqual(resutl.win_start,self.win.win_start)
+        self.assertEqual(result.win_start,self.win.win_start)
         self.assertEqual(result.win_end, self.win.win_end)
         self.assertEqual(result, self.win)
-        os.remove('test_window_one.txt')
+        os.remove('test_window_three.txt')
 
     def test_get_window_end(self):
         self.indexator = Indexer('database')
-        test_file_one = open('test_search_one.txt', 'w') 
-        test_file_one.write('Alina Zakharova is a student)))')
+        test_file_one = open('test_window_four.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student')
         test_file_one.close()
-        self.indexator.get_index_with_line('test_search_one.txt')
+        self.indexator.get_index_with_line('test_window_four.txt')
         del self.indexator
-        self.search = SearchEngine('database')  
-        result = self.window.get_window('test_window_one.txt',Position_Plus(0, 21, 28),3)
-        self.win = Context_Windows('string','positions','win_start','win_end')
-        self.win.string = 'Zakharova is a student'
-        self.win.positions = [Position_Plus(0,6,15),Position_Plus(0,16,18),Position_Plus(0,19,20),Position_Plus(0, 21, 28)]
-        self.win.win_start = Position_Plus(0,6,15)
-        self.win.win_end = Position_Plus(0, 21, 28)
+        self.search = SearchEngine('database')
+        result = self.window.get_window('test_window_four.txt',Position_Plus(0, 21, 28),3)
+        self.win = Context_Window('string','positions','win_start','win_end')
+        self.win.string = 'Alina Zakharova is a student'
+        self.win.positions = [Position_Plus(0, 21, 28)]
+        self.win.win_start = 6
+        self.win.win_end = 28
         self.assertEqual(result.string,self.win.string)
         self.assertEqual(result.positions,self.win.positions)
-        self.assertEqual(resutl.win_start,self.win.win_start)
+        self.assertEqual(result.win_start,self.win.win_start)
         self.assertEqual(result.win_end, self.win.win_end)
         self.assertEqual(result, self.win)
-        os.remove('test_window_one.txt')
+        os.remove('test_window_four.txt')
 
-    """def test_get_window_words(self):
+    def test_myError_str_not_found(self):
         self.indexator = Indexer('database')
-        test_file_one = open('test_search_one.txt', 'w') 
-        test_file_one.write('Alina Zakharova Alina Zakharova is a student)))')
+        test_file_one = open('test_window_five.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student')
         test_file_one.close()
-        self.indexator.get_index_with_line('test_search_one.txt')
+        self.indexator.get_index_with_line('test_window_five.txt')
         del self.indexator
         self.search = SearchEngine('database')
-        result = self.window.get_window('Alina Zakharova',1)
-        cool_result = 'Alina Zakharova','Alina Zakharova Alina'
-        self.assertEqual(result, cool_result)
-        os.remove('test_window_one.txt')"""
-        
-
-    '''def test_get_window_overlap(self):
-        self.indexator = Indexer('database')
-        test_file_one = open('test_window_one.txt', 'w') 
-        test_file_one.write('Alina Zakharova is a student)))')
-        test_file_one.close()
-        self.indexator.get_index_with_line('test_window_one.txt')
-        del self.indexator
-        self.search = SearchEngine('database')
-        result = self.get_window('Alina Zakharova',1)
-        cool_result = 'Alina Zakharova is'
-        self.assertEqual(result, cool_result)
-        os.remove('test_window_one.txt')
-
-    def test_get_window_overlap_many(self):
-        self.indexator = Indexer('database')
-        test_file_one = open('test_window_one.txt', 'w') 
-        test_file_one.write('Alina Zakharova')
-        test_file_one.close()
-        test_file_two = open('test_window_two.txt', 'w') 
-        test_file_two.write(' Alina loves apples)))')
-        test_file_two.close()
-        test_file_three = open('test_window_three.txt', 'w') 
-        test_file_three.write(' Ф 12 !!! @ # student)))')
-        test_file_three.close()
-        self.indexator.get_index_with_line('test_window_one.txt')
-        self.indexator.get_index_with_line('test_window_two.txt')
-        self.indexator.get_index_with_line('test_window_three.txt')
-        del self.indexator
-        self.search = SearchEngine('database')
-        result = self.get_window('Alina Zakharova',1)
-        cool_result = 'Alina Zakharova loves'
-        self.assertEqual(result, cool_result)
-        os.remove('test_window_one.txt')
-        os.remove('test_window_two.txt')
-        os.remove('test_window_three.txt')
-
-    def test_get_window_overlap_not(self):
-        self.indexator = Indexer('database')
-        test_file_one = open('test_window_one.txt', 'w') 
-        test_file_one.write('Alina is a student')
-        test_file_one.close()
-        test_file_two = open('test_window_two.txt', 'w') 
-        test_file_two.write(' Little Zakaharova loves big apples)))')
-        test_file_two.close()
-        test_file_three = open('test_window_three.txt', 'w') 
-        test_file_three.write(' Ф 12 !!! @ # student loves apples')
-        test_file_three.close()
-        self.indexator.get_index_with_line('test_window_one.txt')
-        self.indexator.get_index_with_line('test_window_two.txt')
-        self.indexator.get_index_with_line('test_window_three.txt')
-        del self.indexator
-        self.search = SearchEngine('database')
-        result = self.get_window('Alina Zakharova',1)
-        cool_result = 'Alina is','Little Zakaharova loves'
-        self.assertEqual(result, cool_result)
-        os.remove('test_window_one.txt')
-        os.remove('test_window_two.txt')
-        os.remove('test_window_three.txt')
-'''
-        
+        with self.assertRaises(TypeError):
+            result = self.window.get_window('test_window_five.txt',Position_Plus(3, 21, 28),3)
+        os.remove('test_window_five.txt')    
+       
 
 if __name__ == '__main__':
     unittest.main()        
