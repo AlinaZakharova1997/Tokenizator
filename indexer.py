@@ -12,17 +12,18 @@ class Position(object):
     """
     Class Position
     Cointains positions of each token
-    @param start: position on the 1st element of a token
-    @param end: position on the last element of a token
     """
 
     def __init__(self, start, end):
-        
+        """
+        @param start: position on the 1st element of a token
+        @param end: position on the last element of a token
+        """ 
         self.start = start
         self.end = end
         
     def __eq__(self, position):
-
+      
         return self.start == position.start and self.end == position.end
 
     def __repr__(self):
@@ -34,12 +35,14 @@ class Position_Plus(Position):
     """
     Class Position
     Cointains positions of each token
-    @param start: position on the 1st element of a token
-    @param end: position on the last element of a token
-    @param lnumber: number of a line in a given text
     """
 
     def __init__(self, lnumber, start, end):
+        """
+        @param start: position on the 1st element of a token
+        @param end: position on the last element of a token
+        @param lnumber: number of a line in a given text
+        """
         
         self.start = start
         self.end = end
@@ -61,6 +64,10 @@ class Position_Plus(Position):
         return str(self.lnumber) + ','+ str(self.start) + ',' + str(self.end)
           
 class Indexer(object):
+    """
+    class Indexer
+    Contains database with indexed tokens 
+    """
 
     def __init__(self, database):
         """
