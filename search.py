@@ -13,10 +13,12 @@ from tokenizator import Tokenizator
 class SearchEngine(object):
     """
     class SearchEngine
-    @param database: datadase of tokens and thier positions
     """
     
     def __init__(self,database):
+        """
+        @param database: datadase of tokens and thier positions
+        """
 
         self.database = shelve.open(database,writeback=True)
         self.tokenizator = Tokenizator()
