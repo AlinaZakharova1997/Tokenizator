@@ -38,8 +38,8 @@ class TestMyCode(unittest.TestCase):
         del indexator
         search = SearchEngine('database')  
         result = Context_Window.get_window('test_window_one.txt', Position_Plus(0, 16, 18), 1)
-        win = Context_Window('string','positions','win_start','win_end')
-        win.string ='Alina Zakharova is a student)))'
+        win = Context_Window()
+        win.string = 'Alina Zakharova is a student)))'
         win.positions = [Position_Plus(0, 16, 18)]
         win.win_start = 6
         win.win_end = 20
@@ -59,7 +59,7 @@ class TestMyCode(unittest.TestCase):
         del indexator
         search = SearchEngine('database')  
         result = Context_Window.get_window('test_window_two.txt', Position_Plus(0, 23, 25), 2)
-        win = Context_Window('string','positions','win_start','win_end')
+        win = Context_Window()
         win.string = 'Little Alina Zakharova is a linguist student)))'
         win.positions = [Position_Plus(0, 23, 25)]
         win.win_start = 7
@@ -80,7 +80,7 @@ class TestMyCode(unittest.TestCase):
         del indexator
         search = SearchEngine('database')  
         result = Context_Window.get_window('test_window_three.txt', Position_Plus(0, 0, 5), 2)
-        win = Context_Window('string','positions','win_start','win_end')
+        win = Context_Window()
         win.string = 'Alina Zakharova is a student'
         win.positions = [Position_Plus(0, 0, 5)]
         win.win_start = 0
@@ -101,7 +101,7 @@ class TestMyCode(unittest.TestCase):
         del indexator
         search = SearchEngine('database')
         result = Context_Window.get_window('test_window_four.txt', Position_Plus(0, 21, 28), 3)
-        win = Context_Window('string','positions','win_start','win_end')
+        win = Context_Window()
         win.string = 'Alina Zakharova is a student'
         win.positions = [Position_Plus(0, 21, 28)]
         win.win_start = 6
