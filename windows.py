@@ -48,7 +48,7 @@ class Context_Window(object):
         @param position: object of Position_Plus, contains position of a token in file
         @param win_size: size of a context window
         """
-        if not isinstance(filename, str) or not isinstance(win_size, int)or not type(position) is Position_Plus:
+        if not isinstance(filename, str) or not isinstance(win_size, int) or not type(position) is Position_Plus:
             raise TypeError('Input has an unappropriate type!')
         positions = []
         positions.append(position)
@@ -67,21 +67,21 @@ class Context_Window(object):
             my_file.close() 
             raise IndexError('This string was not found!')
             
-        #here it moves on the string from token start 
-        #and breaks when finds needed number of tokens
+        # here it moves on the string from token start 
+        # and breaks when finds needed number of tokens
         for tok_num, token in enumerate(cls.tokenizator.token_gen(string[position.start:])):
             if tok_num == win_size:
                 break
-        #counts window end   
+        # counts window end   
         win_end = token.position + len(token.s) + position.start
         
         # here it moves on the reversed string
-        #from position.end - 1 to exclude space after the token end
-        #and breaks when finds needed number of tokens
+        # from position.end - 1 to exclude space after the token end
+        # and breaks when finds needed number of tokens
         for tok_num, token in enumerate(cls.tokenizator.token_gen(string[position.end-1::-1])):
             if tok_num == win_size:
                 break
-        #counts window start    
+        # counts window start    
         win_start = position.end - token.position - len(token.s)
         
         my_file.close()    
