@@ -43,9 +43,12 @@ class Context_Window(object):
     @classmethod
     def get_window(cls, filename, position, win_size):
         """
-        This function returns a context window of a given token's position 
+        This function returns a context window of a given token's position
+        @param filename: a name of a file
+        @param position: object of Position_Plus, contains position of a token in file
+        @param win_size: size of a context window
         """
-        if not isinstance(filename, str) or not isinstance(win_size, int):
+        if not isinstance(filename, str) or not isinstance(win_size, int)or not type(position) is Position_Plus:
             raise TypeError('Input has an unappropriate type!')
         positions = []
         positions.append(position)
@@ -54,28 +57,29 @@ class Context_Window(object):
         string = None
         str_num = position.lnumber
         my_file = open(filename)
-        for lnumber,my_string in enumerate(my_file):
+        for lnumber, my_string in enumerate(my_file):
             if lnumber == str_num:
                 string = my_string
                 break
             
-        if string == None:
+        if string is None:
             my_file.close() 
-            raise TypeError('This string was not found!')
+            raise IndexError('This string was not found!')
             
         
-        
-        for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.start:])):
-            if tok_num == 0:
-                win_end = position.end
+        for tok_num, token in enumerate(cls.tokenizator.token_gen(string[position.start:])):
             if tok_num == win_size:
-                win_end = token.position + len(token.s) + position.start
                 break
+        win_end = token.position + len(token.s) + position.start
             
-        for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.end::-1])):
+        for tok_num, token in enumerate(cls.tokenizator.token_gen(string[position.end-1::-1])):
             if tok_num == win_size:
-                win_start = position.end - token.position - len(token.s)
                 break
+        win_start = position.end - token.position - len(token.s)
+        print(position.end, 'pos end')
+        print(token.position, 'tok pos')
+        print(len(token.s),'len tok')
+        
         my_file.close()    
         return cls(string, positions, win_start, win_end)
 
