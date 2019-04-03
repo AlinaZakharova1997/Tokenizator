@@ -60,7 +60,10 @@ class Context_Window(object):
                 break
             
         if string == None:
+            my_file.close() 
             raise TypeError('This string was not found!')
+            
+        
         
         for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.start:])):
             if tok_num == 0:
@@ -73,7 +76,7 @@ class Context_Window(object):
             if tok_num == win_size:
                 win_start = position.end - token.position - len(token.s)
                 break
-            
+        my_file.close()    
         return cls(string, positions, win_start, win_end)
 
 if __name__ == '__main__':
