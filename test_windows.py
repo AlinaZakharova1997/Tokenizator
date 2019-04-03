@@ -60,7 +60,7 @@ class TestMyCode(unittest.TestCase):
         self.assertEqual(result.positions, win.positions)
         self.assertEqual(result.win_start, win.win_start)
         self.assertEqual(result.win_end, win.win_end)
-        self.assertEqual(result,win)
+        self.assertEqual(result, win)
         os.remove('test_window_two.txt')
         
     def test_get_window_begin(self):
