@@ -57,28 +57,32 @@ class Context_Window(object):
         string = None
         str_num = position.lnumber
         my_file = open(filename)
+        # searhes for string with a given number
         for lnumber, my_string in enumerate(my_file):
             if lnumber == str_num:
                 string = my_string
                 break
-            
+        # if there is no such string - raises an error    
         if string is None:
             my_file.close() 
             raise IndexError('This string was not found!')
             
-        
+        #here it moves on the string from token start 
+        #and breaks when finds needed number of tokens
         for tok_num, token in enumerate(cls.tokenizator.token_gen(string[position.start:])):
             if tok_num == win_size:
                 break
+        #counts window end   
         win_end = token.position + len(token.s) + position.start
-            
+        
+        # here it moves on the reversed string
+        #from position.end - 1 to exclude space after the token end
+        #and breaks when finds needed number of tokens
         for tok_num, token in enumerate(cls.tokenizator.token_gen(string[position.end-1::-1])):
             if tok_num == win_size:
                 break
+        #counts window start    
         win_start = position.end - token.position - len(token.s)
-        print(position.end, 'pos end')
-        print(token.position, 'tok pos')
-        print(len(token.s),'len tok')
         
         my_file.close()    
         return cls(string, positions, win_start, win_end)
