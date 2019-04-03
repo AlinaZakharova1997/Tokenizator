@@ -38,11 +38,7 @@ class TestMyCode(unittest.TestCase):
         del indexator
         search = SearchEngine('database')  
         result = Context_Window.get_window('test_window_one.txt', Position_Plus(0, 16, 18), 1)
-        win = Context_Window()
-        win.string = 'Alina Zakharova is a student)))'
-        win.positions = [Position_Plus(0, 16, 18)]
-        win.win_start = 6
-        win.win_end = 20
+        win = Context_Window('Alina Zakharova is a student)))', [Position_Plus(0, 16, 18)], 6, 20)
         self.assertEqual(result.string, win.string)
         self.assertEqual(result.positions, win.positions)
         self.assertEqual(result.win_start, win.win_start)
@@ -59,11 +55,7 @@ class TestMyCode(unittest.TestCase):
         del indexator
         search = SearchEngine('database')  
         result = Context_Window.get_window('test_window_two.txt', Position_Plus(0, 23, 25), 2)
-        win = Context_Window()
-        win.string = 'Little Alina Zakharova is a linguist student)))'
-        win.positions = [Position_Plus(0, 23, 25)]
-        win.win_start = 7
-        win.win_end = 36
+        win = Context_Window('Little Alina Zakharova is a linguist student)))', [Position_Plus(0, 23, 25)], 7, 36)
         self.assertEqual(result.string, win.string)
         self.assertEqual(result.positions, win.positions)
         self.assertEqual(result.win_start, win.win_start)
@@ -80,11 +72,7 @@ class TestMyCode(unittest.TestCase):
         del indexator
         search = SearchEngine('database')  
         result = Context_Window.get_window('test_window_three.txt', Position_Plus(0, 0, 5), 2)
-        win = Context_Window()
-        win.string = 'Alina Zakharova is a student'
-        win.positions = [Position_Plus(0, 0, 5)]
-        win.win_start = 0
-        win.win_end = 18
+        win = Context_Window('Alina Zakharova is a student', [Position_Plus(0, 0, 5)], 0, 18)
         self.assertEqual(result.string, win.string)
         self.assertEqual(result.positions, win.positions)
         self.assertEqual(result.win_start, win.win_start)
@@ -101,11 +89,7 @@ class TestMyCode(unittest.TestCase):
         del indexator
         search = SearchEngine('database')
         result = Context_Window.get_window('test_window_four.txt', Position_Plus(0, 21, 28), 3)
-        win = Context_Window()
-        win.string = 'Alina Zakharova is a student'
-        win.positions = [Position_Plus(0, 21, 28)]
-        win.win_start = 6
-        win.win_end = 28
+        win = Context_Window('Alina Zakharova is a student', [Position_Plus(0, 21, 28)], 6, 28)
         self.assertEqual(result.string, win.string)
         self.assertEqual(result.positions, win.positions)
         self.assertEqual(result.win_start, win.win_start)
