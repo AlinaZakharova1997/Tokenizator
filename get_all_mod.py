@@ -3,8 +3,10 @@ from collections import namedtuple
 from urllib.request import urlopen
 import csv
 from collections import OrderedDict
+from lxml import html, etree, objectify
+from bs4 import BeautifulSoup
 
-from lxml import html
+
 
 # search link for a word
 word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&text=word-info&requestid=1553071332398&language=ru&source='
@@ -20,6 +22,7 @@ def get_word_info(word: str, suff: str, tags: list):
     @param tags: list of word's  grammar tags
     @return: csv files with frequency dictionaries 
     '''
+    print('getwordinfo')
     s_freq_dict = {}
     pr_freq_dict = {}
     v_freq_dict = {}
@@ -32,14 +35,14 @@ def get_word_info(word: str, suff: str, tags: list):
         try:
             pr_list.remove(tag)
             word = Word(word, lemma, tag, pr_list)
-            if Word.tag == 's':
-                s_freq_dict.setdefault(Word.lemma, 0)
+            if tag == 's':
+                s_freq_dict.setdefault(lemma, 0)
                 s_freq_dict[lemma] += 1
-            if Word.tag == 'pr':
-                pr_freq_dict.setdefault(Word.lemma, 0)
+            if tag == 'pr':
+                pr_freq_dict.setdefault(lemma, 0)
                 pr_freq_dict[lemma] += 1
-            if Word.tag == 'v':
-                v_freq_dict.setdefault(Word.lemma, 0)
+            if tag == 'v':
+                v_freq_dict.setdefault(lemma, 0)
                 v_freq_dict[lemma] += 1
 
         except ValueError:
@@ -62,7 +65,7 @@ def get_word_info(word: str, suff: str, tags: list):
     with open('Verb_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
         for key, value in v_freq_dict_sorted.items():
-            writer.writerow([key,value])           
+            writer.writerow([key,value])     
         
 def search_highlighted(url: str, tags: "лист строк"):
     '''
@@ -71,28 +74,42 @@ def search_highlighted(url: str, tags: "лист строк"):
     @param tags: a list of POS tags
     @return: csv file with constructions
     '''
-    with open('Constructions.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter= ' ')
+    print('search')
+    res = []
     parsed_url = html.parse(url)
-    for sentence in parsed_url.xpath('/html/body/div[3]/ol/li[1]/table/tbody/tr/td/ul/li'):
-        string = ''
-        i = 0
-        for highlighted_word in parsed_url.xpath('//span[@class="b-wrd-expl g-em"]'):
-            word = highlighted_word.xpath('text()')
-            suff = highlighted_word.xpath('@explain')
-            if len(word) != 0:
-                try:
-                    get_word_info(word[0], suff[0], tags)
-                    if i < 4:
-                        string += word + ' '
-                        i += 1
-                    if i == 4:
-                        writer.writerow([string])  
-                        i = 0
-                        string = ''
-                except AssertionError:
-                   string += ('Cannot get word')
-             
+    '''for document in range(1,11):
+         
+         for sentence in parsed_url.xpath('/html/body/div[3]/ol/li[{}]/table/tbody/tr/td/ul/li[{}]'.format(document, sentence)):
+             sent = sentence.xpath('text()')
+             string = ''
+             i = 0'''
+    for highlighted_word in parsed_url.xpath('//span[@class="b-wrd-expl g-em"]'):
+        word = highlighted_word.xpath('text()')
+        suff = highlighted_word.xpath('@explain')
+        print(get_word_info(word[0], suff[0], tags))
+        print('hello')
+        if len(word) != 0:
+            print('if')
+            try:
+                get_word_info(word[0], suff[0], tags)
+                if i < 4:
+                      string += word[0] + ' '
+                      i += 1
+                if i == 4:
+                      print(string)
+                      res.append(string)
+                      i = 0
+                      string = ''                   
+            except AssertionError:
+                string += ('Cannot get word')
+                print('cant')
+                    
+        with open('Constructions.csv', 'w') as csv_file:
+            writer = csv.writer(csv_file, delimiter= ' ')
+            for string in res:
+                writer.writerow([string])            
+                 
+                    
 def req(main_link: str, pages: int, tags: list):
     '''
     This function works with the search link and pushes input into the above functions 
@@ -100,13 +117,11 @@ def req(main_link: str, pages: int, tags: list):
     @param pages: number of pages to work with
     @param tags: a list of POS tags
     '''
+    print('req')
     for i in range(pages):
         all_highlighted = search_highlighted(main_link + str(i), tags)
 
-     
-''' /html/body/div[3]/ol/li[1]/table/tbody/tr/td/ul/li[1]
- /html/body/div[3]/ol/li[1]/table/tbody/tr/td/ul/li[2]'''
 # this is the main link
 req(
-    'http://search1.ruscorpora.ru/syntax.xml?kwsz=10&dpp=10&spd=10&spp=50&seed=19324&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=&p=0',
-    8, ['v', 's', 'pr'])
+    'http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
+    2, ['v', 's', 'pr'])
