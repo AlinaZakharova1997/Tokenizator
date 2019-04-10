@@ -44,11 +44,12 @@ class Context_Window(object):
     def get_window(cls, filename, position, win_size):
         """
         This function returns a context window of a given token's position
-        @param filename: a name of a file
-        @param position: object of Position_Plus, contains position of a token in file
-        @param win_size: size of a context window
+        @param filename: a name of a file where token is to be found
+        @param position: a position of a token
+        @param win_size: desirable size of the context window
+        @return: a context window
         """
-        if not isinstance(filename, str) or not isinstance(win_size, int) or not type(position) is Position_Plus:
+        if not isinstance(filename, str) or not isinstance(win_size, int):
             raise TypeError('Input has an unappropriate type!')
         positions = []
         positions.append(position)
@@ -57,35 +58,48 @@ class Context_Window(object):
         string = None
         str_num = position.lnumber
         my_file = open(filename)
-        # searhes for string with a given number
-        for lnumber, my_string in enumerate(my_file):
+        for lnumber,my_string in enumerate(my_file):
             if lnumber == str_num:
                 string = my_string
                 break
-        # if there is no such string - raises an error    
-        if string is None:
-            my_file.close() 
-            raise IndexError('This string was not found!')
             
-        # here it moves on the string from token start 
-        # and breaks when finds needed number of tokens
-        for tok_num, token in enumerate(cls.tokenizator.token_gen(string[position.start:])):
+        if string == None:
+            my_file.close() 
+            raise TypeError('This string was not found!')
+            
+        for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.start:])):
+            if tok_num == 0:
+                win_end = position.end
             if tok_num == win_size:
+                win_end = token.position + len(token.s) + position.start
                 break
-        # counts window end   
-        win_end = token.position + len(token.s) + position.start
-        
-        # here it moves on the reversed string
-        # from position.end - 1 to exclude space after the token end
-        # and breaks when finds needed number of tokens
-        for tok_num, token in enumerate(cls.tokenizator.token_gen(string[position.end-1::-1])):
+            
+        for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.end::-1])):
             if tok_num == win_size:
+                win_start = position.end - token.position - len(token.s)
                 break
-        # counts window start    
-        win_start = position.end - token.position - len(token.s)
-        
         my_file.close()    
         return cls(string, positions, win_start, win_end)
+    
+    @classmethod
+    def get_united_window(window_A, window_B):
+        '''
+        This function checks if windows are crossing and unites them
+        @param window_one: the first window in a pair
+        @param window_two: the second window in a pair
+        @return: united window or a message it was not to be done
+        '''
+        if not isinstance(window_A, Context_Window) or not isinstance(window_B, Context_Window):
+            raise TypeError('Input has an unappropriate type!')
+        if window_A.start < window_B.end and
+        window_A.end > window_B.start:
+            window_A.end == window_B.end
+        return window_A
+            
+        else:
+            s = 'These windows are not to be united'
+            return s
+        
 
 if __name__ == '__main__':
     x = Context_Window('string','positions','win_start','win_end')
