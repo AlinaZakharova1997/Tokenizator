@@ -3,8 +3,8 @@ from collections import namedtuple
 from urllib.request import urlopen
 import csv
 from collections import OrderedDict
-from lxml import html, etree, objectify
-from bs4 import BeautifulSoup
+from lxml import html
+
 
 
 
@@ -75,39 +75,23 @@ def search_highlighted(url: str, tags: "лист строк"):
     @return: csv file with constructions
     '''
     print('search')
-    res = []
     parsed_url = html.parse(url)
-    '''for document in range(1,11):
-         
-         for sentence in parsed_url.xpath('/html/body/div[3]/ol/li[{}]/table/tbody/tr/td/ul/li[{}]'.format(document, sentence)):
-             sent = sentence.xpath('text()')
-             string = ''
-             i = 0'''
-    for highlighted_word in parsed_url.xpath('//span[@class="b-wrd-expl g-em"]'):
-        word = highlighted_word.xpath('text()')
-        suff = highlighted_word.xpath('@explain')
-        print(get_word_info(word[0], suff[0], tags))
-        print('hello')
-        if len(word) != 0:
-            print('if')
-            try:
-                get_word_info(word[0], suff[0], tags)
-                if i < 4:
-                      string += word[0] + ' '
-                      i += 1
-                if i == 4:
-                      print(string)
-                      res.append(string)
-                      i = 0
-                      string = ''                   
-            except AssertionError:
-                string += ('Cannot get word')
-                print('cant')
-                    
+    for sent in parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'):
+        constr = []
+        sent = parsed_url.xpath('text()')
+        full_sent = sent.xpath('normalize-space(.)').split(' [', 1)[0]
+        for highlighted_word in sent.xpath('//span[@class="b-wrd-expl g-em"]'):
+            word = highlighted_word.xpath('text()')
+            suff = highlighted_word.xpath('@explain')
+            get_word_info(word[0], suff[0], tags)
+            print(get_word_info(word[0], suff[0], tags))
+            constr.append(word[0])
+            print('hello')
+        constr_str = ' '.join(constr)
         with open('Constructions.csv', 'w') as csv_file:
             writer = csv.writer(csv_file, delimiter= ' ')
-            for string in res:
-                writer.writerow([string])            
+            for constr in constr_str:
+                writer.writerow([constr])            
                  
                     
 def req(main_link: str, pages: int, tags: list):
