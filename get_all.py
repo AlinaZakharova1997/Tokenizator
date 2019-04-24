@@ -27,7 +27,6 @@ def get_word_info(word: str, suff: str, tags: list) -> Word:
         except ValueError:
             continue
 
-
 def search_highlighted(url: str,
                        tags: "лист строк") -> list:
     res = []
@@ -55,7 +54,6 @@ def req(main_link: str, pages: int, tags: list):
                 f.write(a + '\n')
         f.close()
 
-
 req(
-    'http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=PR&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=S&flags3=&p=0',
-    8, ['v', 's', 'pr'])
+    'http://search1.ruscorpora.ru/syntax.xml?kwsz=10&dpp=10&spd=10&spp=50&seed=19324&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
+8, ['v', 's', 'pr'])
