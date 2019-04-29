@@ -82,7 +82,7 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict):
     parsed_url = html.parse(url)
     constr_str = ''
     for sent in parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'):
-        constr = []
+        constr = ''
         full_sent = sent.xpath('normalize-space(.)').split(' [', 1)[0]
         time.sleep(35) 
         for highlighted_word in sent.xpath('span[@class="b-wrd-expl g-em"]'):
@@ -94,7 +94,7 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict):
                 get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict)
                 '''print(word[0])
                 print('I got info!')'''
-                constr.append(word[0])
+                constr+=word[0]+' '
                 writer.writerow([constr])
         print(constr)
         constr_str = ' '.join(constr)
