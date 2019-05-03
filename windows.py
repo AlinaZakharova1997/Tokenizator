@@ -1,3 +1,4 @@
+
 """
 Context_Windows
 This module returns context windows for each query word
@@ -82,6 +83,11 @@ class Context_Window(object):
         return cls(string, positions, win_start, win_end)
     
     def is_crossed(self, window_B):
+        '''
+        This function checks if windows are crossed
+        @param window_B: the second window
+        @return: True or False
+        '''
         if not isinstance(window_B, Context_Window):
             raise TypeError('Input has an unappropriate type!')
         if self.win_start < window_B.win_end and self.win_end > window_B.win_start:
@@ -92,20 +98,50 @@ class Context_Window(object):
     def get_united_window(self, window_B):
         
         '''
-        This function checks if windows are crossing and unites them
-        @param window_one: the first window in a pair
-        @param window_two: the second window in a pair
-        @return: united window or a message it was not to be done
+        This function unites two windows
+        @param window_B: the second window 
         '''
         
         if not isinstance(window_B, Context_Window):
             raise TypeError('Input has an unappropriate type!')
         
         self.win_end = window_B.win_end
-        self.positions.append(window_B.positions[0])      
+        self.positions.append(window_B.positions[0])
         
-        
+   def unite_all(self,dictionary,win_size):
+       '''
+       This function unites context windows
+       @param dictionary: input dictionary filename:Positions
+       @param win_size: a size of a context window
+       @return: a dictionary filename:Context Windows
+       '''
+       if not isinstance(dictionary, dict) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type!')
+      
+       output_dict = {}
+       win_array = []
+       # value is an array of positions
+       for key,value in dictionary.items():
+           pos_array = value
+           # for each position in values get window()
+           for pos in pos_array:
+               window = get_window(cls,key, pos, win_size)
+               win_array.append(window)
+           # add key and win_array into output_dict    
+           output_dict.setdefault(key,win_array)
+           
+       i = 0
+       for key, win_array in output_dict.items():
+           while i<len(win_array)-1:
+               if win_array[i].is_crossed(win_array[i+1]):
+                   win_array[i].get_united_window(win_array[i+1])
+                   win_array.remove(win_array[i+1])
+               else:
+                   i+=1
 
+       return dictionary            
+                   
+               
 if __name__ == '__main__':
     window_A = Context_Window.get_window('test.txt', Position_Plus(0, 15, 20), 1)
     window_B = Context_Window.get_window('test.txt', Position_Plus(0, 8, 14), 1)
@@ -114,4 +150,4 @@ if __name__ == '__main__':
     window_A = window_A.get_united_window(window_B)
     print(window_A.win_start, 'A_start')
     print(window_A.win_end, 'A_end')
-   
+     
