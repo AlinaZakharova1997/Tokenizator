@@ -106,9 +106,9 @@ class Context_Window(object):
             raise TypeError('Input has an unappropriate type!')
         
         self.win_end = window_B.win_end
-        self.positions.append(window_B.positions[0])
+        self.positions.append(window_B.positions)
         
-   def unite_all(self,dictionary,win_size):
+    def unite_all(self,dictionary,win_size):
        '''
        This function unites context windows
        @param dictionary: input dictionary filename:Positions
@@ -125,14 +125,14 @@ class Context_Window(object):
            pos_array = value
            # for each position in values get window()
            for pos in pos_array:
-               window = get_window(cls,key, pos, win_size)
+               window = get_window(cls, key, pos, win_size)
                win_array.append(window)
            # add key and win_array into output_dict    
-           output_dict.setdefault(key,win_array)
+           output_dict.setdefault(key, win_array)
            
        i = 0
        for key, win_array in output_dict.items():
-           while i<len(win_array)-1:
+           while i < len(win_array)-1:
                if win_array[i].is_crossed(win_array[i+1]):
                    win_array[i].get_united_window(win_array[i+1])
                    win_array.remove(win_array[i+1])
@@ -143,11 +143,9 @@ class Context_Window(object):
                    
                
 if __name__ == '__main__':
-    window_A = Context_Window.get_window('test.txt', Position_Plus(0, 15, 20), 1)
-    window_B = Context_Window.get_window('test.txt', Position_Plus(0, 8, 14), 1)
-    print(window_A.win_start, 'A_start')
-    print(window_A.win_end, 'A_end')
-    window_A = window_A.get_united_window(window_B)
-    print(window_A.win_start, 'A_start')
-    print(window_A.win_end, 'A_end')
+    window_A = Context_Window('string','positions','win_start','win_end')
+    window_B = Context_Window('string','positions','win_start','win_end')
+    window_X = window_A.get_window('test.txt', Position_Plus(0, 4, 20), 1)
+    window_Y = window_B.get_window('test.txt', Position_Plus(0, 9, 30), 1)
+    window_X.get_united_window(window_Y)
      
