@@ -16,7 +16,7 @@ class TestMyCode(unittest.TestCase):
         self.maxDiff = None
         self.window = Context_Window('string','positions','win_start','win_end')
         self.result = Context_Window('string','positions','win_start','win_end')
-
+        
     def tearDown(self):
         if hasattr(self, 'search'):
             del self.search
@@ -128,10 +128,14 @@ class TestMyCode(unittest.TestCase):
         with self.assertRaises(TypeError):
             result = self.window.get_window('test_window_five.txt', Position_Plus(3, 21, 28), 3)
         os.remove('test_window_five.txt')
-        
-   def test_united_type_error(self):
+
+    def test_united_type_error(self):
        with self.assertRaises(TypeError):
             self.window.get_united_window(12, 'window)))')
+            
+    def test_crossed_type_error(self):
+       with self.assertRaises(TypeError):
+            self.window.is_crossed(12, 'window)))')         
 
    def test_united_window(self):
         self.indexator = Indexer('database')
@@ -143,7 +147,7 @@ class TestMyCode(unittest.TestCase):
         self.search = SearchEngine('database')
         window_A = self.window.get_window('test_united_window.txt', Position_Plus(0, 15, 20), 1)
         window_B = self.window.get_window('test_united_window.txt', Position_Plus(0, 8, 14), 1)
-        united_AB = self.window.get_united_window(window_A, window_B)
+        united_AB = window_A.get_united_window(window_B)
         self.win = Context_Window('string','positions','win_start','win_end')
         self.win.string = 'The girl named Alina Zakharova is a student'
         self.win.positions = [Position_Plus(0, 15, 20)]
@@ -153,30 +157,39 @@ class TestMyCode(unittest.TestCase):
         self.assertEqual(united_AB.positions, self.win.positions)
         self.assertEqual(united_AB.win_start, self.win.win_start)
         self.assertEqual(united_AB.win_end, self.win.win_end)
-        self.assertEqual(united_AB, self.win)
         os.remove('test_united_window.txt')
-
-  def test_not_united(self):
+        
+    def test_is_crossed(self):
         self.indexator = Indexer('database')
-        test_file_one = open('test_not_united.txt', 'w') 
+        test_file_one = open('test_crossed_window.txt', 'w') 
         test_file_one.write('The girl named Alina Zakharova is a student')
         test_file_one.close()
-        self.indexator.get_index_with_line('test_united_window.txt')
+        self.indexator.get_index_with_line('test_crossed_window.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        window_A = self.window.get_window('test_crossed_window.txt', Position_Plus(0, 15, 20), 1)
+        window_B = self.window.get_window('test_crossed_window.txt', Position_Plus(0, 8, 14), 1)
+        crossed_AB = window_A.is_crossed(window_B)
+        result = True
+        self.assertEqual(result, crossed_AB)
+        os.remove('test_crossed_window.txt')  
+
+    def test_not_crossed(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_not_crossed_window.txt', 'w') 
+        test_file_one.write('The girl named Alina Zakharova is a student')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_not_crossed_window.txt')
         del self.indexator
         self.search = SearchEngine('database')
         window_A = self.window.get_window('test_united_window.txt', Position_Plus(0, 31, 33), 1)
         window_B = self.window.get_window('test_united_window.txt', Position_Plus(0, 8, 14), 1)
-        united_AB = self.window.get_united_window(window_A, window_B)
-        result = 'These windows are not to be united'
-        self.assertEqual(united_AB, result)
-        os.remove('test_not_united.txt')
+        crossed_AB = window_A.is_crossed(window_B)
+        result = False
+        self.assertEqual(result, crossed_AB)
+        os.remove('test_not_crossed_window.txt') 
         
-      
-        
-       
-       
 
 if __name__ == '__main__':
     unittest.main()        
         
-
