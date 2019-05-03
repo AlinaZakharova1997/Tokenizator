@@ -139,7 +139,7 @@ class Context_Window(object):
                else:
                    i+=1
 
-       return dictionary            
+       return output_dict            
                    
                
 if __name__ == '__main__':
