@@ -189,6 +189,24 @@ class TestMyCode(unittest.TestCase):
         self.assertEqual(result, crossed_AB)
         os.remove('test_not_crossed_window.txt') 
         
+        def test_TypeError_unite_all(self):
+        with self.assertRaises(TypeError):
+            self.window.unite_all(12, 'window)))')
+
+    def test_unite_all(self):
+        self.indexator = Indexer('database')
+        test_file = open('test_unite_all.txt', 'w') 
+        test_file.write('The girl named Alina Zakharova is a student')
+        test_file.close()
+        self.indexator.get_index_with_line('test_search_one.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        dictionary = {'test_unite_all.txt':[]}
+        output_dict = {'test_search_one.txt': [Position_Plus(0,14,19)]}
+        self.assertEqual(result, cool_result)
+        os.remove('test_unite_all.txt')
+           
+        
 
 if __name__ == '__main__':
     unittest.main()        
