@@ -81,26 +81,37 @@ class Context_Window(object):
         my_file.close()    
         return cls(string, positions, win_start, win_end)
     
-    @classmethod
-    def get_united_window(window_A, window_B):
+    def is_crossed(self, window_B):
+        if not isinstance(window_B, Context_Window):
+            raise TypeError('Input has an unappropriate type!')
+        if self.win_start < window_B.win_end and self.win_end > window_B.win_start:
+            return True
+        else:
+            return False
+        
+    def get_united_window(self, window_B):
+        
         '''
         This function checks if windows are crossing and unites them
         @param window_one: the first window in a pair
         @param window_two: the second window in a pair
         @return: united window or a message it was not to be done
         '''
-        if not isinstance(window_A, Context_Window) or not isinstance(window_B, Context_Window):
+        
+        if not isinstance(window_B, Context_Window):
             raise TypeError('Input has an unappropriate type!')
-        if window_A.start < window_B.end and
-        window_A.end > window_B.start:
-            window_A.end == window_B.end
-        return window_A
-            
-        else:
-            s = 'These windows are not to be united'
-            return s
+        
+        self.win_end = window_B.win_end
+        self.positions.append(window_B.positions[0])      
+        
         
 
 if __name__ == '__main__':
-    x = Context_Window('string','positions','win_start','win_end')
-    print(x.get_window('try.txt', Position_Plus(0,16,18), 1))
+    window_A = Context_Window.get_window('test.txt', Position_Plus(0, 15, 20), 1)
+    window_B = Context_Window.get_window('test.txt', Position_Plus(0, 8, 14), 1)
+    print(window_A.win_start, 'A_start')
+    print(window_A.win_end, 'A_end')
+    window_A = window_A.get_united_window(window_B)
+    print(window_A.win_start, 'A_start')
+    print(window_A.win_end, 'A_end')
+   
