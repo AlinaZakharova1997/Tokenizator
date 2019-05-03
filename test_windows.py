@@ -137,7 +137,7 @@ class TestMyCode(unittest.TestCase):
        with self.assertRaises(TypeError):
             self.window.is_crossed(12, 'window)))')         
 
-   def test_united_window(self):
+    def test_united_window(self):
         self.indexator = Indexer('database')
         test_file_one = open('test_united_window.txt', 'w') 
         test_file_one.write('The girl named Alina Zakharova is a student')
@@ -145,18 +145,17 @@ class TestMyCode(unittest.TestCase):
         self.indexator.get_index_with_line('test_united_window.txt')
         del self.indexator
         self.search = SearchEngine('database')
-        window_A = self.window.get_window('test_united_window.txt', Position_Plus(0, 15, 20), 1)
-        window_B = self.window.get_window('test_united_window.txt', Position_Plus(0, 8, 14), 1)
+        window_A = self.window.get_window('test_united_window.txt', Position_Plus(0, 4, 20), 1)
+        window_B = self.window.get_window('test_united_window.txt', Position_Plus(0, 9, 30), 1)
         united_AB = window_A.get_united_window(window_B)
         self.win = Context_Window('string','positions','win_start','win_end')
         self.win.string = 'The girl named Alina Zakharova is a student'
-        self.win.positions = [Position_Plus(0, 15, 20)]
+        self.win.positions = [Position_Plus(0, 4, 20),Position_Plus(0, 9, 30)]
         self.win.win_start = 8
         self.win.win_end = 20
-        self.assertEqual(united_AB.string, self.win.string)
-        self.assertEqual(united_AB.positions, self.win.positions)
-        self.assertEqual(united_AB.win_start, self.win.win_start)
-        self.assertEqual(united_AB.win_end, self.win.win_end)
+        self.assertEqual(window_A.string, self.win.string)
+        self.assertEqual(window_A.win_start, self.win.win_start)
+        self.assertEqual(window_A.win_end, self.win.win_end)
         os.remove('test_united_window.txt')
         
     def test_is_crossed(self):
@@ -170,8 +169,7 @@ class TestMyCode(unittest.TestCase):
         window_A = self.window.get_window('test_crossed_window.txt', Position_Plus(0, 15, 20), 1)
         window_B = self.window.get_window('test_crossed_window.txt', Position_Plus(0, 8, 14), 1)
         crossed_AB = window_A.is_crossed(window_B)
-        result = True
-        self.assertEqual(result, crossed_AB)
+        self.assertEqual(True, crossed_AB)
         os.remove('test_crossed_window.txt')  
 
     def test_not_crossed(self):
@@ -182,14 +180,13 @@ class TestMyCode(unittest.TestCase):
         self.indexator.get_index_with_line('test_not_crossed_window.txt')
         del self.indexator
         self.search = SearchEngine('database')
-        window_A = self.window.get_window('test_united_window.txt', Position_Plus(0, 31, 33), 1)
-        window_B = self.window.get_window('test_united_window.txt', Position_Plus(0, 8, 14), 1)
+        window_A = self.window.get_window('test_not_crossed_window.txt', Position_Plus(0, 31, 33), 1)
+        window_B = self.window.get_window('test_not_crossed_window.txt', Position_Plus(0, 8, 14), 1)
         crossed_AB = window_A.is_crossed(window_B)
-        result = False
-        self.assertEqual(result, crossed_AB)
-        os.remove('test_not_crossed_window.txt') 
-        
-        def test_TypeError_unite_all(self):
+        self.assertEqual(False, crossed_AB)
+        os.remove('test_not_crossed_window.txt')
+
+    def test_TypeError_unite_all(self):
         with self.assertRaises(TypeError):
             self.window.unite_all(12, 'window)))')
 
@@ -198,16 +195,16 @@ class TestMyCode(unittest.TestCase):
         test_file = open('test_unite_all.txt', 'w') 
         test_file.write('The girl named Alina Zakharova is a student')
         test_file.close()
-        self.indexator.get_index_with_line('test_search_one.txt')
+        self.indexator.get_index_with_line('test_unite_all.txt')
         del self.indexator
         self.search = SearchEngine('database')
         dictionary = {'test_unite_all.txt':[]}
-        output_dict = {'test_search_one.txt': [Position_Plus(0,14,19)]}
+        output_dict = {'test_unite_all.txt': [Position_Plus(0,14,19)]}
         self.assertEqual(result, cool_result)
         os.remove('test_unite_all.txt')
-           
+       
         
 
 if __name__ == '__main__':
-    unittest.main()        
+    unittest.main()       
         
