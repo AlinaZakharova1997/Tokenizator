@@ -193,18 +193,24 @@ class TestMyCode(unittest.TestCase):
     def test_unite_all(self):
         self.indexator = Indexer('database')
         test_file = open('test_unite_all.txt', 'w') 
-        test_file.write('The girl named Alina Zakharova is a student')
+        test_file.write('Alina Zakharova is a student')
         test_file.close()
         self.indexator.get_index_with_line('test_unite_all.txt')
         del self.indexator
         self.search = SearchEngine('database')
-        dictionary = {'test_unite_all.txt':[]}
-        output_dict = {'test_unite_all.txt': [Position_Plus(0,14,19)]}
-        self.assertEqual(result, cool_result)
+        dictionary = self.search.get_dict_many_tokens('Alina Zakharova is a student')
+        input_dictionary = {'test_unite_all.txt':[Position_Plus(0, 0, 5),Position_Plus(0, 6, 15),
+                                                  Position_Plus(0, 16, 18),Position_Plus(0, 19, 20),
+                                                  Position_Plus(0, 21, 28)]}
+        self.assertEqual(dictionary, input_dictionary)
+        dict_to_function = self.window.unite_all(dictionary, 1)
+        output_dict = {'test_unite_all.txt':[Context_Window('Alina Zakharova',[Position_Plus(0, 0, 5), Position_Plus(0, 6, 15)], 0, 15),
+                                             Context_Window('is a student',[Position_Plus(0, 16, 18), Position_Plus(0, 19, 20),Position_Plus(0, 21, 28)], 16, 28)]}
+        self.assertEqual(dict_to_function,output_dict)
         os.remove('test_unite_all.txt')
        
         
 
 if __name__ == '__main__':
-    unittest.main()       
+    unittest.main()        
         
