@@ -125,7 +125,7 @@ class Context_Window(object):
            pos_array = value
            # for each position in values get window()
            for pos in pos_array:
-               window = get_window(cls, key, pos, win_size)
+               window = self.get_window(key, pos, win_size)
                win_array.append(window)
            # add key and win_array into output_dict    
            output_dict.setdefault(key, win_array)
@@ -148,4 +148,3 @@ if __name__ == '__main__':
     window_X = window_A.get_window('test.txt', Position_Plus(0, 4, 20), 1)
     window_Y = window_B.get_window('test.txt', Position_Plus(0, 9, 30), 1)
     window_X.get_united_window(window_Y)
-     
