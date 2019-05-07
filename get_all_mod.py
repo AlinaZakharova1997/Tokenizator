@@ -41,7 +41,7 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
         v_freq_dict.setdefault(lemma, 0)
         v_freq_dict[lemma] += 1
         print(params[0])
-    elif params[0] == 'adv':
+    elif params[0] == 'adv'or params[0] == 'a':
         adv_freq_dict.setdefault(lemma, 0)
         adv_freq_dict[lemma] += 1
         print(params[0])
@@ -107,11 +107,11 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
         '''constr_str = ' '.join(constr)'''
         print('I got constr_str!')
         
-        with open('Constructions.csv', 'w') as csv_file:
-            writer = csv.writer(csv_file, delimiter= ';')
-            for constr in constr_str:
-                writer.writerow([constr])
-                """print('I got constr!!')"""
+    with open('Constructions.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file, delimiter= ';')
+        for constr in constr_str:
+            writer.writerow([constr])
+            """print('I got constr!!')"""
         time.sleep(300) 
 def req(main_link: str, pages: int):
     '''
