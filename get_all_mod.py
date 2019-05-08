@@ -107,7 +107,7 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
         '''constr_str = ' '.join(constr)'''
         print('I got constr_str!')
         
-    with open('Constructions.csv', 'w') as csv_file:
+    with open('Constructions.csv', 'a') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
         for constr in constr_str:
             writer.writerow([constr])
@@ -120,6 +120,8 @@ def req(main_link: str, pages: int):
     @param pages: number of pages to work with
     @param tags: a list of POS tags
     '''
+    Constructions = open('Constructions.csv', 'w')
+    Constructions.close()
     s_freq_dict = {}
     pr_freq_dict = {}
     v_freq_dict = {}
