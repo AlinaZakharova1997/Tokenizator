@@ -6,21 +6,20 @@ from collections import OrderedDict
 from lxml import html
 import time
 
-
-
 # search link for a word
 word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&text=word-info&requestid=1553071332398&language=ru&source='
 # tuple that contains information about word and the word itself
 Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
 Constructions = open('Constructions.csv', 'w')
 Constructions.close()
+PAUSE_AFTER_FAILURE = 3
+MAX_RETRY = 3
 def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
     '''
     This function gets information about a given word and makes frequency dictionaries
     for each part of speech (noun, preposition, verb)
     @param word: string containing a word
     @param suff: string containing search suffix to find a word
-    @param tags: list of word's  grammar tags
     @return: csv files with frequency dictionaries 
     '''
     print('getwordinfo')
@@ -50,12 +49,7 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
         print('Error! Tag not found!')
         print(params[0])
         print(word)
-    '''for key, value in pr_freq_dict.items():
-        print([key,value])
-    for key, value in v_freq_dict.items():
-        print([key,value])
-    for key, value in s_freq_dict.items():
-        print([key,value])'''
+        
     pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Prep_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
@@ -83,7 +77,6 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
     '''
     This function searches all highlighted words and makes constructions
     @param url: string adress of a searching query
-    @param tags: a list of POS tags
     @return: csv file with constructions
     '''
     print('search')
@@ -103,21 +96,18 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
                 constr+=word[0]+' '
         constr_str.append(constr)    
         print(constr)
-        '''constr_str = ' '.join(constr)'''
         print('I got constr_str!')
         
     with open('Constructions.csv', 'a') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
         for constr in constr_str:
             writer.writerow([constr])
-            """print('I got constr!!')"""
-        time.sleep(300) 
+        '''time.sleep(300)''' 
 def req(main_link: str, pages: int):
     '''
     This function works with the search link and pushes input into the above functions 
     @param main_link: an url string adress
     @param pages: number of pages to work with
-    @param tags: a list of POS tags
     '''
     s_freq_dict = {}
     pr_freq_dict = {}
@@ -125,14 +115,17 @@ def req(main_link: str, pages: int):
     adv_freq_dict = {}
     print('req')
     for i in range(pages):
-        all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
-        time.sleep(300)  
+        try:
+            for n_try in range(MAX_RETRY):
+                all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
+            break
+        except Exception:
+            time.sleep(PAUSE_AFTER_FAILURE)  
 # this is the main link
 req(
-'http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
-10)
+'http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=200&spp=200&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S%2C%E2%E8%ED&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
+4)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=%EF%F0%E8%F7&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=ADV&flags4=
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
-
 
 
