@@ -106,7 +106,7 @@ class Context_Window(object):
             raise TypeError('Input has an unappropriate type!')
         
         self.win_end = window_B.win_end
-        self.positions.append(window_B.positions)
+        self.positions.extend(window_B.positions)
         
     def unite_all(self,dictionary,win_size):
        '''
