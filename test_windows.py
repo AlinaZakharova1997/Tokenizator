@@ -249,7 +249,23 @@ class TestMyCode(unittest.TestCase):
         self.assertEqual(dict_to_function, output_dict)
         os.remove('test_unite.txt')
 
-        
+   def test_TypeError_extend_window(self):
+        with self.assertRaises(TypeError):
+            self.window.unite_all('window)))')
+            
+    def test_extend_window(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_extend_window.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student!!')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_extend_window.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        window = self.window.get_window('test_extend_window.txt', Position_Plus(0, 6, 15), 1)
+        result = self.window.extend_window(window)
+        extended_window = Context_Window('Alina Zakharova is a student!!',Position_Plus(0, 6, 15), 0, 30)
+        self.assertEqual(result, extended_window)
+        os.remove('test_extend_window.txt')     
 
 if __name__ == '__main__':
     unittest.main()        
