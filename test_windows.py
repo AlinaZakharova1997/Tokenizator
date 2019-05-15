@@ -253,7 +253,7 @@ class TestMyCode(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.window.unite_all('window)))')
             
-    def test_extend_window(self):
+   def test_extend_window(self):
         self.indexator = Indexer('database')
         test_file_one = open('test_extend_window.txt', 'w') 
         test_file_one.write('Alina Zakharova is a student!!')
@@ -265,7 +265,18 @@ class TestMyCode(unittest.TestCase):
         result = self.window.extend_window(window)
         extended_window = Context_Window('Alina Zakharova is a student!!',Position_Plus(0, 6, 15), 0, 30)
         self.assertEqual(result, extended_window)
-        os.remove('test_extend_window.txt')     
+        os.remove('test_extend_window.txt') 
+        
+   def test_already_extended_window(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_already_extended_window.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student!!')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_already_extended_window.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        window = self.window.get_window('test_already_extended_window.txt',Position_Plus(0, 16, 18), 2)
+        os.remove('test_already_extended_window.txt')    
 
 if __name__ == '__main__':
     unittest.main()        
