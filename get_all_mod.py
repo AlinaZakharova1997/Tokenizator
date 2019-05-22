@@ -1,4 +1,4 @@
-import codecs                         
+mport codecs                         
 from collections import namedtuple
 from urllib.request import urlopen
 import csv
@@ -59,8 +59,7 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     with open('Noun_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
         for key, value in s_freq_dict_sorted.items():
-            writer.writerow([key,value])
-    print('v_dict')        
+            writer.writerow([key,value])        
     v_freq_dict_sorted = OrderedDict(sorted(v_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Verb_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
@@ -85,7 +84,6 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
     for sent in parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'):
         constr = ''
         full_sent = sent.xpath('normalize-space(.)').split(' [', 1)[0]
-        time.sleep(300) 
         for highlighted_word in sent.xpath('span[@class="b-wrd-expl g-em"]'):
             word = highlighted_word.xpath('text()')
             suff = highlighted_word.xpath('@explain')
@@ -102,7 +100,7 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
         writer = csv.writer(csv_file, delimiter= ';')
         for constr in constr_str:
             writer.writerow([constr])
-        '''time.sleep(300)''' 
+ 
 def req(main_link: str, pages: int):
     '''
     This function works with the search link and pushes input into the above functions 
@@ -115,6 +113,7 @@ def req(main_link: str, pages: int):
     adv_freq_dict = {}
     print('req')
     for i in range(pages):
+        print('I got page %s'%i)
         try:
             for n_try in range(MAX_RETRY):
                 all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
@@ -127,5 +126,6 @@ req(
 4)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=%EF%F0%E8%F7&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=ADV&flags4=
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
+
 
 
