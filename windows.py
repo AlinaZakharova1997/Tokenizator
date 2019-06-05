@@ -5,11 +5,13 @@ This module returns context windows for each query word
 """
 import tokenizator
 from tokenizator import Tokenizator
-import search
-from search import SearchEngine
 import indexer
 from indexer import Indexer,Position_Plus
+import re
 
+# make a pattern for re.match()
+pattern_right = re.compile(r'[.!?] [A-ZА-Я]')
+pattern_left = re.compile(r'[A-ZА-Я] [.!?]')
 
 class Context_Window(object):
     """
@@ -108,62 +110,38 @@ class Context_Window(object):
         self.win_end = window_B.win_end
         self.positions.extend(window_B.positions)
         
-    def unite_all(self,dictionary,win_size):
-       '''
-       This function unites context windows
-       @param dictionary: input dictionary filename:Positions
-       @param win_size: a size of a context window
-       @return: a dictionary filename:Context Windows
-       '''
-       if not isinstance(dictionary, dict) or not isinstance(win_size, int):
-            raise TypeError('Input has an unappropriate type!')
-      
-       output_dict = {}
-       win_array = []
-       # value is an array of positions
-       for key,value in dictionary.items():
-           pos_array = value
-           # for each position in values get window()
-           for pos in pos_array:
-               window = self.get_window(key, pos, win_size)
-               win_array.append(window)
-           # add key and win_array into output_dict    
-           output_dict.setdefault(key, win_array)
-           
-       i = 0
-       for key, win_array in output_dict.items():
-           while i < len(win_array)-1:
-               if win_array[i].is_crossed(win_array[i+1]):
-                   win_array[i].get_united_window(win_array[i+1])
-                   win_array.remove(win_array[i+1])
-               else:
-                   i+=1
-
-       return output_dict 
 
     def extend_window(self):
-        # make a pattern for re.search()
-        pattern_right = re.compile(r'[\.!?] *[A-Z А-Я]*')
-        pattern_left = re.compile(r'[A-Z А-Я]* *\.!?]|$')
+        '''
+        This function extends a given window to sentence
+        @return: an extended window
+        ''' 
         to_right = self.string[self.win_start:]
         to_left = self.string[self.win_end+1::-1]
-        if self.win_start !=0:
-            self.win_start =  self.win_start - pattern_left.search(to_left).start()
+        result = pattern_left.match(to_left)
+        if result is not None and self.win_start !=0:
+            self.win_start =  self.win_start - result.start()
+        else:
+            self.win_start = 0
         if self.win_end < len(self.string):
-            self.win_end += pattern_right.search(to_right).start() + 1
-            
-    def unite_extended(self, query, win_size):
-        if not isinstance(dictionary, dict) or not isinstance(win_size, int):
-            raise TypeError('Input has an unappropriate type!')
-        to_dict = self.get_dict_many_tokens(query)
-        dictionary = self.unite_all(to_dict, win_size)
-        for value in dictionary.values():
-            for window in value:
-                ext = self.extend_window(window)            
+            result = pattern_right.match(to_right)
+            if result is not None:
+                self.win_end += result.end() + 1
+            else:
+                self.win_end = len(self.string)
+        
+  
+        
                
 if __name__ == '__main__':
     window_A = Context_Window('string','positions','win_start','win_end')
     window_B = Context_Window('string','positions','win_start','win_end')
     window_X = window_A.get_window('test.txt', Position_Plus(0, 4, 20), 1)
     window_Y = window_B.get_window('test.txt', Position_Plus(0, 9, 30), 1)
-    window_X.get_united_window(window_Y)
+    print(type(window_X))
+    print(window_X.positions,'positions')
+    print(window_X.win_start, 'start')
+    '''window_X.get_united_window(window_Y)'''
+    window_X.extend_window()
+    print(window_X.positions,'positions')
+    print(window_X.win_start, 'start')
