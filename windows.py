@@ -139,8 +139,27 @@ class Context_Window(object):
                else:
                    i+=1
 
-       return output_dict            
-                   
+       return output_dict 
+
+    def extend_window(self):
+        # make a pattern for re.search()
+        pattern_right = re.compile(r'[\.!?] *[A-Z А-Я]*')
+        pattern_left = re.compile(r'[A-Z А-Я]* *\.!?]|$')
+        to_right = self.string[self.win_start:]
+        to_left = self.string[self.win_end+1::-1]
+        if self.win_start !=0:
+            self.win_start =  self.win_start - pattern_left.search(to_left).start()
+        if self.win_end < len(self.string):
+            self.win_end += pattern_right.search(to_right).start() + 1
+            
+    def unite_extended(self, query, win_size):
+        if not isinstance(dictionary, dict) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type!')
+        to_dict = self.get_dict_many_tokens(query)
+        dictionary = self.unite_all(to_dict, win_size)
+        for value in dictionary.values():
+            for window in value:
+                ext = self.extend_window(window)            
                
 if __name__ == '__main__':
     window_A = Context_Window('string','positions','win_start','win_end')
