@@ -8,6 +8,10 @@ import indexer
 from indexer import Indexer, Position_Plus
 import tokenizator
 from tokenizator import Tokenizator
+import windows
+from windows import Context_Window
+import re
+
 
 
 class SearchEngine(object):
@@ -22,6 +26,7 @@ class SearchEngine(object):
 
         self.database = shelve.open(database,writeback=True)
         self.tokenizator = Tokenizator()
+        
 
     def __del__(self):
         self.database.close()    
@@ -67,3 +72,66 @@ class SearchEngine(object):
             for token in self.tokenizator.token_gen(tok_str):
                output_dict.setdefault(filename,[]).extend(self.database[token.s][filename])
         return output_dict
+            
+    def unite_all(self,dictionary,win_size):
+       '''
+       This function unites context windows
+       @param dictionary: input dictionary filename:Positions
+       @param win_size: a size of a context window
+       @return: a dictionary filename:Context Windows
+       '''
+       if not isinstance(dictionary, dict) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type!')
+      
+       output_dict = {}
+       win_array = []
+       # value is an array of positions
+       for key,value in dictionary.items():
+           pos_array = value
+           # for each position in values get window()
+           for pos in pos_array:
+               window = Context_Window.get_window(key, pos, win_size)
+               win_array.append(window)
+           # add key and win_array into output_dict    
+           output_dict.setdefault(key, win_array)
+           
+       i = 0
+       for key, win_array in output_dict.items():
+           while i < len(win_array)-1:
+               if win_array[i].is_crossed(win_array[i+1]):
+                   win_array[i].get_united_window(win_array[i+1])
+                   win_array.remove(win_array[i+1])
+               else:
+                   i+=1
+
+       return output_dict
+    
+    def unite_extended(self, query, win_size):
+        '''
+        This function unites extended windows in a dictionary
+        It takes query and win_size, makes a dictionary from query,
+        than makes a new one but with windows as values,
+        extends these windows and finally unites them once again
+        @param query: string query
+        @param win_size: size of a window
+        @return: dictionary with extended and reunated windows
+        '''
+        
+        if not isinstance(query, str) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type!')
+        
+        to_dict = self.get_dict_many_tokens(query)
+        dictionary = self.unite_all(to_dict, win_size)
+        for value in dictionary.values():
+            for window in value:
+                window = Context_Window.extend_window(window)       
+        i = 0
+        for key, win_array in dictionary.items():
+            while i < len(win_array)-1:
+                if win_array[i].is_crossed(win_array[i+1]):
+                    win_array[i].get_united_window(win_array[i+1])
+                    win_array.remove(win_array[i+1])
+                else:
+                    i+=1
+         
+        return dictionary 
