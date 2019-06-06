@@ -131,7 +131,16 @@ class Context_Window(object):
                 self.win_end = len(self.string)
         
   
-        
+     def highlight_window(self):
+        '''
+        This function takes a substring of window string,
+        which corresponds to the window size and highlights it 
+        '''
+        win_string = self.string[self.win_start:self.win_end]
+        for position in (self.positions):
+            win_string = win_string[:position.start - self.win_start] + '<b>' + win_string[position.start - self.win_start:]
+            win_string = win_string[:position.end - self.win_end] + '</b>' + win_string[position.end - self.win_end:]
+        return win_string    
                
 if __name__ == '__main__':
     window_A = Context_Window('string','positions','win_start','win_end')
