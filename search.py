@@ -135,3 +135,22 @@ class SearchEngine(object):
                     i+=1
          
         return dictionary 
+    
+    def query_search(self, query, win_size):
+        '''
+        This function performs searching a query in database and returs
+        a dictionary filemname:query in string format
+        @param query: query to search
+        @param win_size: a size of a context window
+        @return: dictionary {filename: [query(str)]}
+        '''
+        if not isinstance(query, str) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type!')
+        
+        output_dict = {} 
+        dictionary = self.unite_extended(query, win_size)
+        for key, value in dictionary.items():
+            for window in value:
+                string = window.highlight_window()
+                output_dict.setdefault(key, []).append(string)
+        return output_dict   
