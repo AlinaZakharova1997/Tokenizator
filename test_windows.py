@@ -44,7 +44,7 @@ class TestMyCode(unittest.TestCase):
         self.win = Context_Window('string','positions','win_start','win_end')
         self.win.string ='Alina Zakharova is a student)))'
         self.win.positions = [Position_Plus(0,16,18)]
-        self.win.win_start = 5
+        self.win.win_start = 6
         self.win.win_end = 20
         self.assertEqual(result.string,self.win.string)
         self.assertEqual(result.positions,self.win.positions)
@@ -65,7 +65,7 @@ class TestMyCode(unittest.TestCase):
         self.win = Context_Window('string','positions','win_start','win_end')
         self.win.string = 'Little Alina Zakharova is a linguist student)))'
         self.win.positions = [Position_Plus(0,23,25)]
-        self.win.win_start = 6
+        self.win.win_start = 7
         self.win.win_end = 36
         self.assertEqual(result.string,self.win.string)
         self.assertEqual(result.positions,self.win.positions)
@@ -82,12 +82,12 @@ class TestMyCode(unittest.TestCase):
         self.indexator.get_index_with_line('test_window_three.txt')
         del self.indexator
         self.search = SearchEngine('database')  
-        result = windows.Context_Window.get_window('test_window_three.txt',Position_Plus(0, 0, 5),2)
+        result = windows.Context_Window.get_window('test_window_three.txt',Position_Plus(0, 0, 5),1)
         self.win = Context_Window('string','positions','win_start','win_end')
         self.win.string = 'Alina Zakharova is a student'
         self.win.positions = [Position_Plus(0, 0, 5)]
         self.win.win_start = 0
-        self.win.win_end = 18
+        self.win.win_end = 15
         self.assertEqual(result.string,self.win.string)
         self.assertEqual(result.positions,self.win.positions)
         self.assertEqual(result.win_start,self.win.win_start)
@@ -147,7 +147,7 @@ class TestMyCode(unittest.TestCase):
         window_A = windows.Context_Window.get_window('test_united_window.txt', Position_Plus(0, 4, 20), 1)
         window_B = windows.Context_Window.get_window('test_united_window.txt', Position_Plus(0, 9, 30), 1)
         united_AB = window_A.get_united_window(window_B)
-        self.win = windows.Context_Window('The girl named Alina Zakharova is a student',[Position_Plus(0, 4, 20),Position_Plus(0, 9, 30)],8,20)
+        self.win = windows.Context_Window('The girl named Alina Zakharova is a student',[Position_Plus(0, 4, 20),Position_Plus(0, 9, 30)],9,20)
         self.assertEqual(window_A.string, self.win.string)
         self.assertEqual(window_A.win_start, self.win.win_start)
         self.assertEqual(window_A.win_end, self.win.win_end)
@@ -217,12 +217,11 @@ class TestMyCode(unittest.TestCase):
         self.search = SearchEngine('database')
         window = windows.Context_Window.get_window('test_highlight_window.txt', Position_Plus(0, 6, 15), 1)
         result = window.highlight_window()
-        output_string = 'Alina <b>Zakharova</b> is a student'
+        output_string = 'Alina <b>Zakharova</b> is'
         self.assertEqual(result, output_string)
         os.remove('test_highlight_window.txt')
        
-    
-     
+  
 
 
         
