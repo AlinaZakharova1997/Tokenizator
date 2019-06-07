@@ -9,6 +9,7 @@ import indexer
 from indexer import Indexer,Position_Plus
 import re
 
+
 # make a pattern for re.match()
 pattern_right = re.compile(r'[.!?] [A-ZА-Я]')
 pattern_left = re.compile(r'[A-ZА-Я] [.!?]')
@@ -79,8 +80,9 @@ class Context_Window(object):
             
         for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.end::-1])):
             if tok_num == win_size:
-                win_start = position.end - token.position - len(token.s)
+                win_start = position.end - token.position - len(token.s)   
                 break
+            
         my_file.close()    
         return cls(string, positions, win_start, win_end)
     
@@ -130,17 +132,16 @@ class Context_Window(object):
             else:
                 self.win_end = len(self.string)
         
-  
-     def highlight_window(self):
+    def highlight_window(self):
         '''
         This function takes a substring of window string,
         which corresponds to the window size and highlights it 
         '''
-        win_string = self.string[self.win_start:self.win_end]
-        for position in (self.positions):
+        win_string = self.string[self.win_start:self.win_end]' 
+        for position in reversed(self.positions):
             win_string = win_string[:position.start - self.win_start] + '<b>' + win_string[position.start - self.win_start:]
-            win_string = win_string[:position.end - self.win_end] + '</b>' + win_string[position.end - self.win_end:]
-        return win_string    
+            win_string = win_string[:position.end - self.win_start] + '</b>' + win_string[position.end - self.win_start:]
+        return win_string
                
 if __name__ == '__main__':
     window_A = Context_Window('string','positions','win_start','win_end')
@@ -154,3 +155,4 @@ if __name__ == '__main__':
     window_X.extend_window()
     print(window_X.positions,'positions')
     print(window_X.win_start, 'start')
+   
