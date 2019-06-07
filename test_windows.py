@@ -206,10 +206,28 @@ class TestMyCode(unittest.TestCase):
         self.search = SearchEngine('database')
         window = windows.Context_Window.get_window('test_already_extended_window.txt',Position_Plus(0, 16, 18), 2)
         os.remove('test_already_extended_window.txt')
+        
+    def test_highlight_window_one(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_highlight_window.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_highlight_window.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        window = windows.Context_Window.get_window('test_highlight_window.txt', Position_Plus(0, 6, 15), 1)
+        result = window.highlight_window()
+        output_string = 'Alina <b>Zakharova</b> is a student'
+        self.assertEqual(result, output_string)
+        os.remove('test_highlight_window.txt')
+       
+    
+     
 
 
-
+        
 if __name__ == '__main__':
     unittest.main()
+
    
         
