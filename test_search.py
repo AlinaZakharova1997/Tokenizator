@@ -215,6 +215,19 @@ class TestMyCode(unittest.TestCase):
                                                                                             Position_Plus(0, 21, 28)], 0, 30)]}
         self.assertEqual(result, fine_result)
         os.remove('test_unite_extended.txt')
+        
+    def test_query_search(self):
+       test_file_one = open('test_query_search.txt', 'w') 
+       test_file_one.write('Alina Zakharova is a student!!')
+       test_file_one.close()
+       self.indexator.get_index_with_line('test_query_search.txt')
+       del self.indexator
+       self.search = SearchEngine('database')
+       query = 'Zakharova'
+       result = self.search.query_search(query, 1)
+       fine_result = {'test_query_search.txt':['Alina <b>Zakharova</b> is a student!!']}
+       self.assertEqual(result, fine_result)
+       os.remove('test_query_search.txt')
    
         
 if __name__ == '__main__':
