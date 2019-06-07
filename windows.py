@@ -137,7 +137,7 @@ class Context_Window(object):
         This function takes a substring of window string,
         which corresponds to the window size and highlights it 
         '''
-        win_string = self.string[self.win_start:self.win_end]' 
+        win_string = self.string[self.win_start:self.win_end] 
         for position in reversed(self.positions):
             win_string = win_string[:position.start - self.win_start] + '<b>' + win_string[position.start - self.win_start:]
             win_string = win_string[:position.end - self.win_start] + '</b>' + win_string[position.end - self.win_start:]
