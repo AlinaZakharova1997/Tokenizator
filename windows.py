@@ -78,13 +78,14 @@ class Context_Window(object):
                 win_end = token.position + len(token.s) + position.start
                 break
             
-        for tok_num,token in enumerate (cls.tokenizator.token_gen(string[position.end::-1])):
+        for tok_num,token in enumerate (cls.tokenizator.token_gen(string[:position.end][::-1])):
             if tok_num == win_size:
                 win_start = position.end - token.position - len(token.s)   
                 break
             
         my_file.close()    
         return cls(string, positions, win_start, win_end)
+    
     
     def is_crossed(self, window_B):
         '''
@@ -131,7 +132,7 @@ class Context_Window(object):
                 self.win_end += result.end() + 1
             else:
                 self.win_end = len(self.string)
-        
+                
     def highlight_window(self):
         '''
         This function takes a substring of window string,
@@ -139,8 +140,10 @@ class Context_Window(object):
         '''
         win_string = self.string[self.win_start:self.win_end] 
         for position in reversed(self.positions):
-            win_string = win_string[:position.start - self.win_start] + '<b>' + win_string[position.start - self.win_start:]
-            win_string = win_string[:position.end - self.win_start] + '</b>' + win_string[position.end - self.win_start:]
+            begin = position.start - self.win_start
+            end = position.end - self.win_start
+            win_string = win_string[:end] + '</b>' + win_string[end:]
+            win_string = win_string[:begin] + '<b>' + win_string[begin:]
         return win_string
                
 if __name__ == '__main__':
