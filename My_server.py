@@ -61,7 +61,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 hi_str = window.highlight_window()
                 self.wfile.write(bytes('<li><p>"%s"</p></li>'), %hi_str, encoding="UTF-8")
             self.wfile.write(bytes('</ul>'), encoding="UTF-8")  
-            self.wfile.write(bytes ('</ol></body></html>', encoding="UTF-8"))
+        self.wfile.write(bytes ('</ol></body></html>', encoding="UTF-8"))
      
                
 def main():
