@@ -1,4 +1,4 @@
-mport codecs                         
+import codecs                         
 from collections import namedtuple
 from urllib.request import urlopen
 import csv
@@ -10,8 +10,10 @@ import time
 word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&text=word-info&requestid=1553071332398&language=ru&source='
 # tuple that contains information about word and the word itself
 Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
-Constructions = open('Constructions.csv', 'w')
+Constructions = open('Constructions.txt', 'w')
 Constructions.close()
+Lemmas = open('Lemmas.txt','w')
+Lemmas.close()
 PAUSE_AFTER_FAILURE = 3
 MAX_RETRY = 3
 def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
@@ -26,28 +28,28 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     constr_str = ''
     parsed_url = html.parse(word_search_link + suff)
     info = parsed_url.xpath('//td[@class="value"]/text()')
-    lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '')
+    lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') # где лучше записать леммы в файл?
     params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
-    pr_list = params.split(',\xa0')
-    if params[0] == 's':
+    pr_set = set(params.split(',\xa0') )
+    # почему лучше сделать множество? как тогда обратиться к элементу и напечатать его, чтобы проверить, что все хорошо?
+    if  's' in pr_set :
         s_freq_dict.setdefault(lemma, 0)
         s_freq_dict[lemma] += 1
-        print(params[0])
-    elif params[0] == 'pr' or params[0] == 'p':
+        
+    elif  'pr' in pr_set:
         pr_freq_dict.setdefault(lemma, 0)
         pr_freq_dict[lemma] += 1
-        print(params[0])
-    elif params[0] == 'v' or params[0] == '3':
+      
+    elif 'v' in pr_set:
         v_freq_dict.setdefault(lemma, 0)
         v_freq_dict[lemma] += 1
-        print(params[0])
-    elif params[0] == 'adv'or params[0] == 'a':
+       
+    elif 'adv'in pr_set:
         adv_freq_dict.setdefault(lemma, 0)
         adv_freq_dict[lemma] += 1
-        print(params[0])
+        
     else:
         print('Error! Tag not found!')
-        print(params[0])
         print(word)
         
     pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
@@ -79,6 +81,7 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
     @return: csv file with constructions
     '''
     print('search')
+    Constructions = open('Constructions.txt', 'a')
     parsed_url = html.parse(url)
     constr_str = []
     for sent in parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'):
@@ -92,14 +95,16 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
             else:
                 get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
                 constr+=word[0]+' '
-        constr_str.append(constr)    
+        Constructions.write(constr) # пиши в файл здесь!!!
         print(constr)
         print('I got constr_str!')
         
-    with open('Constructions.csv', 'a') as csv_file:
+    '''with open('Constructions.csv', 'a') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
         for constr in constr_str:
-            writer.writerow([constr])
+            writer.writerow([constr])'''
+# запиши все в обычный файл в самом цикле
+
  
 def req(main_link: str, pages: int):
     '''
@@ -118,14 +123,15 @@ def req(main_link: str, pages: int):
             for n_try in range(MAX_RETRY):
                 all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
             break
-        except Exception:
+        except HTTPError:
             time.sleep(PAUSE_AFTER_FAILURE)  
+# блоки try, exept отлавливать только ту ошибку, которая возникает, когда сервер отвалился! а не все возможные ошибки!!!!
+# отдельный скрипт, который проверит, какие леммы вошли в макушку частотника и то, что вошло мы и обработаем в онтологии и работать будем с леммами
+# какой процент составляют все конструкции со стрелочной омонимии
 # this is the main link
 req(
 'http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=200&spp=200&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S%2C%E2%E8%ED&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
 4)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=%EF%F0%E8%F7&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=ADV&flags4=
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
-
-
 
