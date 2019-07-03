@@ -12,8 +12,8 @@ word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&my
 Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
 Constructions = open('Constructions.txt', 'w')
 Constructions.close()
-Lemmas = open('Lemmas.txt','w')
-Lemmas.close()
+all_lemmas = open('lemmas.txt',w)
+all_lemmas.close()
 PAUSE_AFTER_FAILURE = 3
 MAX_RETRY = 3
 def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
@@ -26,9 +26,10 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     '''
     print('getwordinfo')
     constr_str = ''
+    all_lemmas = open('lemmas.txt',a)
     parsed_url = html.parse(word_search_link + suff)
     info = parsed_url.xpath('//td[@class="value"]/text()')
-    lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') # где лучше записать леммы в файл?
+    lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
     params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
     pr_set = set(params.split(',\xa0') )
     # почему лучше сделать множество? как тогда обратиться к элементу и напечатать его, чтобы проверить, что все хорошо?
@@ -51,7 +52,10 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     else:
         print('Error! Tag not found!')
         print(word)
-        
+
+    all_lemmas.write(lemma)
+    print('I got a lemma!')
+    print(lemma)
     pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Prep_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
@@ -96,8 +100,9 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
                 get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
                 constr+=word[0]+' '
         Constructions.write(constr) # пиши в файл здесь!!!
-        print(constr)
         print('I got constr_str!')
+        print(constr)
+      
         
     '''with open('Constructions.csv', 'a') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
