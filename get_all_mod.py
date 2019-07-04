@@ -12,7 +12,7 @@ word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&my
 Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
 Constructions = open('Constructions.txt', 'w')
 Constructions.close()
-all_lemmas = open('lemmas.txt',w)
+all_lemmas = open('lemmas.txt','w')
 all_lemmas.close()
 PAUSE_AFTER_FAILURE = 3
 MAX_RETRY = 3
@@ -26,13 +26,12 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     '''
     print('getwordinfo')
     constr_str = ''
-    all_lemmas = open('lemmas.txt',a)
+    all_lemmas = open('lemmas.txt','a')
     parsed_url = html.parse(word_search_link + suff)
     info = parsed_url.xpath('//td[@class="value"]/text()')
     lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
     params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
     pr_set = set(params.split(',\xa0') )
-    # почему лучше сделать множество? как тогда обратиться к элементу и напечатать его, чтобы проверить, что все хорошо?
     if  's' in pr_set :
         s_freq_dict.setdefault(lemma, 0)
         s_freq_dict[lemma] += 1
@@ -52,10 +51,12 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     else:
         print('Error! Tag not found!')
         print(word)
-
+        
+    # пишу лемму в файл
     all_lemmas.write(lemma)
     print('I got a lemma!')
     print(lemma)
+    
     pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Prep_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
@@ -85,9 +86,11 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
     @return: csv file with constructions
     '''
     print('search')
-    Constructions = open('Constructions.txt', 'a')
+    # Доходит только до этого места, дальше никак. Почему такое может происходить? как понять, пока пишешь код, что такое вообще возможно?
     parsed_url = html.parse(url)
+    print('I parsed url')
     constr_str = []
+    Constructions = open('Constructions.txt', 'a')
     for sent in parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'):
         constr = ''
         full_sent = sent.xpath('normalize-space(.)').split(' [', 1)[0]
@@ -99,7 +102,7 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
             else:
                 get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
                 constr+=word[0]+' '
-        Constructions.write(constr) # пиши в файл здесь!!!
+                Constructions.write(constr) # пиши в файл здесь!!!
         print('I got constr_str!')
         print(constr)
       
@@ -108,7 +111,7 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
         writer = csv.writer(csv_file, delimiter= ';')
         for constr in constr_str:
             writer.writerow([constr])'''
-# запиши все в обычный файл в самом цикле
+
 
  
 def req(main_link: str, pages: int):
@@ -125,18 +128,20 @@ def req(main_link: str, pages: int):
     for i in range(pages):
         print('I got page %s'%i)
         try:
+            print('I try!')
             for n_try in range(MAX_RETRY):
                 all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
             break
-        except HTTPError:
+        except Exception:
             time.sleep(PAUSE_AFTER_FAILURE)  
 # блоки try, exept отлавливать только ту ошибку, которая возникает, когда сервер отвалился! а не все возможные ошибки!!!!
 # отдельный скрипт, который проверит, какие леммы вошли в макушку частотника и то, что вошло мы и обработаем в онтологии и работать будем с леммами
 # какой процент составляют все конструкции со стрелочной омонимии
 # this is the main link
 req(
-'http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=200&spp=200&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S%2C%E2%E8%ED&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
+'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= ',
 4)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=%EF%F0%E8%F7&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=ADV&flags4=
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
+
 
