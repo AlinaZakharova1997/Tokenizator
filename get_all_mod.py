@@ -73,6 +73,11 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
         print('Error! Tag not found!')
         print(word)
         
+    noun_lemmas.close()
+    verb_lemmas.close()
+    prep_lemmas.close()
+    adv_lemmas.close()
+    print('I closed all lemmas files!')
     
     pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Prep_dict.csv', 'w') as csv_file:
@@ -106,8 +111,8 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
     parsed_url = html.parse(url)
     print('I parsed url')
     constr_str = []
-    Constructions = open('Constructions.txt', 'a')
-    print('I opened constructions file')
+    '''Constructions = open('Constructions.txt', 'a')
+    print('I opened constructions file')'''
     '''/html/body/div[4]/ol/li[1]/table/tbody/tr/td/ul/li[1]
     document.querySelector('body > div.content > ol > li:nth-child(1) > table > tbody > tr > td > ul > li:nth-child(1) > span:nth-child(8)')
     '''
@@ -125,9 +130,13 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
                 constr+=word[0]+' '
         print('I got constr_str!')
         print(constr)
+        Constructions = open('Constructions.txt', 'a')
+        print('I opened constructions file')
         Constructions.write(constr + '\n')
         print('I wrote constr str!')
-
+        Constructions.close()
+        print('I closed Constructions.txt!')
+    
 def req(main_link: str, pages: int):
     '''
     This function works with the search link and pushes input into the above functions 
@@ -158,5 +167,6 @@ req(
 7)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
 'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= '
+
 
 
