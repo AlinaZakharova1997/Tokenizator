@@ -111,8 +111,8 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
     parsed_url = html.parse(url)
     print('I parsed url')
     constr_str = []
-    '''Constructions = open('Constructions.txt', 'a')
-    print('I opened constructions file')'''
+    Constructions = open('Constructions.txt', 'a')
+    print('I opened constructions file')
     '''/html/body/div[4]/ol/li[1]/table/tbody/tr/td/ul/li[1]
     document.querySelector('body > div.content > ol > li:nth-child(1) > table > tbody > tr > td > ul > li:nth-child(1) > span:nth-child(8)')
     '''
@@ -130,12 +130,14 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
                 constr+=word[0]+' '
         print('I got constr_str!')
         print(constr)
-        Constructions = open('Constructions.txt', 'a')
-        print('I opened constructions file')
+        '''Constructions = open('Constructions.txt', 'a')
+        print('I opened constructions file')'''
         Constructions.write(constr + '\n')
         print('I wrote constr str!')
-        Constructions.close()
-        print('I closed Constructions.txt!')
+        '''Constructions.close()
+        print('I closed Constructions.txt!')'''
+    Constructions.close()
+    print('I closed Constructions.txt!')    
     
 def req(main_link: str, pages: int):
     '''
@@ -157,7 +159,10 @@ def req(main_link: str, pages: int):
                 all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
                 break
         except Exception:
-            time.sleep(PAUSE_AFTER_FAILURE)  
+            raise 
+            time.sleep(PAUSE_AFTER_FAILURE)
+            print('Smth BAD happened!')
+           
 # блоки try, exept отлавливать только ту ошибку, которая возникает, когда сервер отвалился! а не все возможные ошибки!!!!
 # отдельный скрипт, который проверит, какие леммы вошли в макушку частотника и то, что вошло мы и обработаем в онтологии и работать будем с леммами
 # какой процент составляют все конструкции со стрелочной омонимии
@@ -167,6 +172,7 @@ req(
 7)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
 'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= '
+
 
 
 
