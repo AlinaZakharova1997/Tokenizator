@@ -20,8 +20,23 @@ prep_lemmas = open('prep_lemmas.txt','w')
 prep_lemmas.close()
 adv_lemmas = open('adv_lemmas.txt','w')
 adv_lemmas.close()
+global_dict = {}
 PAUSE_AFTER_FAILURE = 3
 MAX_RETRY = 3
+
+def get_lemma_and_params(suff: str):
+    '''
+    This function gets lemma and params with gram info
+    @param suff:string containing search suffix to find a word
+    @return: lemma and params
+    ''' 
+        parsed_url = html.parse(word_search_link + suff)
+        info = parsed_url.xpath('//td[@class="value"]/text()')
+        lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
+        params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
+        return lemma, params
+       
+'''global_dict.setdefault(suff,[lemma,params])'''    
 def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
     '''
     This function gets information about a given word and makes frequency dictionaries
@@ -36,10 +51,12 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     verb_lemmas = open('verb_lemmas.txt','a')
     prep_lemmas = open('prep_lemmas.txt','a')
     adv_lemmas = open('adv_lemmas.txt','a')
-    parsed_url = html.parse(word_search_link + suff)
-    info = parsed_url.xpath('//td[@class="value"]/text()')
-    lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
-    params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
+    if suff not in global_dict:
+        lemma, params = get_lemma_and_params(suff: str)
+        global_dict[suff] = (lemma, params)
+    else:
+         lemma, params = global_dict[suff]
+        
     pr_set = set(params.split(',\xa0') )
     if  's' in pr_set :
         s_freq_dict.setdefault(lemma, 0)
@@ -152,16 +169,15 @@ def req(main_link: str, pages: int):
     print('req')
     for i in range(pages):
         print('I got page %s'%i)
-        
-        try:
-            print('I try!')
-            for n_try in range(MAX_RETRY):
+        for n_try in range(MAX_RETRY):
+            try:
+                print('I try!')
                 all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
                 break
-        except Exception:
-            raise 
-            time.sleep(PAUSE_AFTER_FAILURE)
-            print('Smth BAD happened!')
+            except Exception:
+                raise 
+                time.sleep(PAUSE_AFTER_FAILURE)
+                print('Smth BAD happened!')
            
 # блоки try, exept отлавливать только ту ошибку, которая возникает, когда сервер отвалился! а не все возможные ошибки!!!!
 # отдельный скрипт, который проверит, какие леммы вошли в макушку частотника и то, что вошло мы и обработаем в онтологии и работать будем с леммами
