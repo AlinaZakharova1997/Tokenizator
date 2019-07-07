@@ -12,8 +12,14 @@ word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&my
 Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
 Constructions = open('Constructions.txt', 'w')
 Constructions.close()
-all_lemmas = open('lemmas.txt','w')
-all_lemmas.close()
+noun_lemmas = open('noun_lemmas.txt','w')
+noun_lemmas.close()
+verb_lemmas = open('verb_lemmas.txt','w')
+verb_lemmas.close()
+prep_lemmas = open('prep_lemmas.txt','w')
+prep_lemmas.close()
+adv_lemmas = open('adv_lemmas.txt','w')
+adv_lemmas.close()
 PAUSE_AFTER_FAILURE = 3
 MAX_RETRY = 3
 def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
@@ -26,7 +32,10 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     '''
     print('getwordinfo')
     constr_str = ''
-    all_lemmas = open('lemmas.txt','a')
+    noun_lemmas = open('noun_lemmas.txt','a')
+    verb_lemmas = open('verb_lemmas.txt','a')
+    prep_lemmas = open('prep_lemmas.txt','a')
+    adv_lemmas = open('adv_lemmas.txt','a')
     parsed_url = html.parse(word_search_link + suff)
     info = parsed_url.xpath('//td[@class="value"]/text()')
     lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
@@ -35,27 +44,35 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     if  's' in pr_set :
         s_freq_dict.setdefault(lemma, 0)
         s_freq_dict[lemma] += 1
+        noun_lemmas.write(lemma + '\n')
+        print('I got a lemma!')
+        print(lemma)
         
     elif  'pr' in pr_set:
         pr_freq_dict.setdefault(lemma, 0)
         pr_freq_dict[lemma] += 1
+        prep_lemmas.write(lemma + '\n')
+        print('I got a lemma!')
+        print(lemma)
       
     elif 'v' in pr_set:
         v_freq_dict.setdefault(lemma, 0)
         v_freq_dict[lemma] += 1
+        verb_lemmas.write(lemma + '\n')
+        print('I got a lemma!')
+        print(lemma)
        
     elif 'adv'in pr_set:
         adv_freq_dict.setdefault(lemma, 0)
         adv_freq_dict[lemma] += 1
+        adv_lemmas.write(lemma + '\n')
+        print('I got a lemma!')
+        print(lemma)
         
     else:
         print('Error! Tag not found!')
         print(word)
         
-    # пишу лемму в файл
-    all_lemmas.write(lemma)
-    print('I got a lemma!')
-    print(lemma)
     
     pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Prep_dict.csv', 'w') as csv_file:
@@ -91,9 +108,14 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
     print('I parsed url')
     constr_str = []
     Constructions = open('Constructions.txt', 'a')
+    print('I opened constructions file')
+    '''/html/body/div[4]/ol/li[1]/table/tbody/tr/td/ul/li[1]
+    document.querySelector('body > div.content > ol > li:nth-child(1) > table > tbody > tr > td > ul > li:nth-child(1) > span:nth-child(8)')
+    '''
     for sent in parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'):
         constr = ''
         full_sent = sent.xpath('normalize-space(.)').split(' [', 1)[0]
+        print('I am in the circle!')
         for highlighted_word in sent.xpath('span[@class="b-wrd-expl g-em"]'):
             word = highlighted_word.xpath('text()')
             suff = highlighted_word.xpath('@explain')
@@ -102,8 +124,9 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
             else:
                 get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
                 constr+=word[0]+' '
-                Constructions.write(constr) # пиши в файл здесь!!!
         print('I got constr_str!')
+        Constructions.write(constr + '\n') # файл остается пустым, хотя до и после все выполняется и печатается; почему так может быть?
+        print('I wrote constr str!')
         print(constr)
       
         
@@ -139,9 +162,9 @@ def req(main_link: str, pages: int):
 # какой процент составляют все конструкции со стрелочной омонимии
 # this is the main link
 req(
-'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= ',
-4)
-# http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=%EF%F0%E8%F7&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=ADV&flags4=
-# http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
+'http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=100&spd=100&spp=500&seed=2569&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=&p=0',
+7)
+# http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
+'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= '
 
 
