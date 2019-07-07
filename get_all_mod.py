@@ -103,7 +103,6 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
     @return: csv file with constructions
     '''
     print('search')
-    # Доходит только до этого места, дальше никак. Почему такое может происходить? как понять, пока пишешь код, что такое вообще возможно?
     parsed_url = html.parse(url)
     print('I parsed url')
     constr_str = []
@@ -125,9 +124,11 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
                 get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
                 constr+=word[0]+' '
         print('I got constr_str!')
-        Constructions.write(constr + '\n') # файл остается пустым, хотя до и после все выполняется и печатается; почему так может быть?
-        print('I wrote constr str!')
         print(constr)
+        Constructions.write(constr + '\n')
+        print('I wrote constr str!')
+       
+        
       
         
     '''with open('Constructions.csv', 'a') as csv_file:
@@ -154,7 +155,7 @@ def req(main_link: str, pages: int):
             print('I try!')
             for n_try in range(MAX_RETRY):
                 all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
-            break
+                break
         except Exception:
             time.sleep(PAUSE_AFTER_FAILURE)  
 # блоки try, exept отлавливать только ту ошибку, которая возникает, когда сервер отвалился! а не все возможные ошибки!!!!
