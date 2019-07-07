@@ -127,17 +127,7 @@ def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_fre
         print(constr)
         Constructions.write(constr + '\n')
         print('I wrote constr str!')
-       
-        
-      
-        
-    '''with open('Constructions.csv', 'a') as csv_file:
-        writer = csv.writer(csv_file, delimiter= ';')
-        for constr in constr_str:
-            writer.writerow([constr])'''
 
-
- 
 def req(main_link: str, pages: int):
     '''
     This function works with the search link and pushes input into the above functions 
@@ -151,6 +141,7 @@ def req(main_link: str, pages: int):
     print('req')
     for i in range(pages):
         print('I got page %s'%i)
+        
         try:
             print('I try!')
             for n_try in range(MAX_RETRY):
@@ -163,7 +154,7 @@ def req(main_link: str, pages: int):
 # какой процент составляют все конструкции со стрелочной омонимии
 # this is the main link
 req(
-'http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=100&spd=100&spp=500&seed=2569&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=&p=0',
+'http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=100&spd=100&spp=500&seed=10330&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
 7)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
 'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= '
