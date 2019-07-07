@@ -30,11 +30,11 @@ def get_lemma_and_params(suff: str):
     @param suff:string containing search suffix to find a word
     @return: lemma and params
     ''' 
-        parsed_url = html.parse(word_search_link + suff)
-        info = parsed_url.xpath('//td[@class="value"]/text()')
-        lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
-        params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
-        return lemma, params
+    parsed_url = html.parse(word_search_link + suff)
+    info = parsed_url.xpath('//td[@class="value"]/text()')
+    lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
+    params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
+    return lemma, params
        
 '''global_dict.setdefault(suff,[lemma,params])'''    
 def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
@@ -52,7 +52,7 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     prep_lemmas = open('prep_lemmas.txt','a')
     adv_lemmas = open('adv_lemmas.txt','a')
     if suff not in global_dict:
-        lemma, params = get_lemma_and_params(suff: str)
+        lemma, params = get_lemma_and_params(suff)
         global_dict[suff] = (lemma, params)
     else:
          lemma, params = global_dict[suff]
@@ -96,27 +96,6 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     adv_lemmas.close()
     print('I closed all lemmas files!')
     
-    pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
-    with open('Prep_dict.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter= ';')
-        for key, value in pr_freq_dict_sorted.items():
-            writer.writerow([key,value])
-    s_freq_dict_sorted = OrderedDict(sorted(s_freq_dict.items(), key = lambda t: t[1],reverse=True))
-    with open('Noun_dict.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter= ';')
-        for key, value in s_freq_dict_sorted.items():
-            writer.writerow([key,value])        
-    v_freq_dict_sorted = OrderedDict(sorted(v_freq_dict.items(), key = lambda t: t[1], reverse=True))
-    with open('Verb_dict.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter= ';')
-        for key, value in v_freq_dict_sorted.items():
-            writer.writerow([key,value]) 
-    adv_freq_dict_sorted = OrderedDict(sorted(adv_freq_dict.items(), key = lambda t: t[1], reverse=True))
-    with open('Adverb_dict.csv', 'w') as csv_file:
-        writer = csv.writer(csv_file, delimiter= ';')
-        for key, value in adv_freq_dict_sorted.items():
-            writer.writerow([key,value])         
-            
                                   
 def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
     '''
@@ -178,7 +157,28 @@ def req(main_link: str, pages: int):
                 raise 
                 time.sleep(PAUSE_AFTER_FAILURE)
                 print('Smth BAD happened!')
-           
+
+    pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
+    with open('Prep_dict.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file, delimiter= ';')
+        for key, value in pr_freq_dict_sorted.items():
+            writer.writerow([key,value])
+    s_freq_dict_sorted = OrderedDict(sorted(s_freq_dict.items(), key = lambda t: t[1],reverse=True))
+    with open('Noun_dict.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file, delimiter= ';')
+        for key, value in s_freq_dict_sorted.items():
+            writer.writerow([key,value])        
+    v_freq_dict_sorted = OrderedDict(sorted(v_freq_dict.items(), key = lambda t: t[1], reverse=True))
+    with open('Verb_dict.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file, delimiter= ';')
+        for key, value in v_freq_dict_sorted.items():
+            writer.writerow([key,value]) 
+    adv_freq_dict_sorted = OrderedDict(sorted(adv_freq_dict.items(), key = lambda t: t[1], reverse=True))
+    with open('Adverb_dict.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file, delimiter= ';')
+        for key, value in adv_freq_dict_sorted.items():
+            writer.writerow([key,value])         
+                   
 # блоки try, exept отлавливать только ту ошибку, которая возникает, когда сервер отвалился! а не все возможные ошибки!!!!
 # отдельный скрипт, который проверит, какие леммы вошли в макушку частотника и то, что вошло мы и обработаем в онтологии и работать будем с леммами
 # какой процент составляют все конструкции со стрелочной омонимии
@@ -188,7 +188,6 @@ req(
 7)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
 'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= '
-
 
 
 
