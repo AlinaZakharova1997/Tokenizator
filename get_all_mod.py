@@ -12,14 +12,6 @@ word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&my
 Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
 Constructions = open('Constructions.txt', 'w')
 Constructions.close()
-noun_lemmas = open('noun_lemmas.txt','w')
-noun_lemmas.close()
-verb_lemmas = open('verb_lemmas.txt','w')
-verb_lemmas.close()
-prep_lemmas = open('prep_lemmas.txt','w')
-prep_lemmas.close()
-adv_lemmas = open('adv_lemmas.txt','w')
-adv_lemmas.close()
 global_dict = {}
 PAUSE_AFTER_FAILURE = 3
 MAX_RETRY = 3
@@ -35,8 +27,7 @@ def get_lemma_and_params(suff: str):
     lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
     params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
     return lemma, params
-       
-'''global_dict.setdefault(suff,[lemma,params])'''    
+          
 def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
     '''
     This function gets information about a given word and makes frequency dictionaries
@@ -47,10 +38,6 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     '''
     print('getwordinfo')
     constr_str = ''
-    noun_lemmas = open('noun_lemmas.txt','a')
-    verb_lemmas = open('verb_lemmas.txt','a')
-    prep_lemmas = open('prep_lemmas.txt','a')
-    adv_lemmas = open('adv_lemmas.txt','a')
     if suff not in global_dict:
         lemma, params = get_lemma_and_params(suff)
         global_dict[suff] = (lemma, params)
@@ -61,42 +48,33 @@ def get_word_info(word: str, suff: str, s_freq_dict, pr_freq_dict, v_freq_dict, 
     if  's' in pr_set :
         s_freq_dict.setdefault(lemma, 0)
         s_freq_dict[lemma] += 1
-        noun_lemmas.write(lemma + '\n')
         print('I got a lemma!')
         print(lemma)
         
     elif  'pr' in pr_set:
         pr_freq_dict.setdefault(lemma, 0)
         pr_freq_dict[lemma] += 1
-        prep_lemmas.write(lemma + '\n')
+        '''prep_lemmas.write(lemma + '\n')'''
         print('I got a lemma!')
         print(lemma)
       
     elif 'v' in pr_set:
         v_freq_dict.setdefault(lemma, 0)
         v_freq_dict[lemma] += 1
-        verb_lemmas.write(lemma + '\n')
+       
         print('I got a lemma!')
         print(lemma)
        
     elif 'adv'in pr_set:
         adv_freq_dict.setdefault(lemma, 0)
         adv_freq_dict[lemma] += 1
-        adv_lemmas.write(lemma + '\n')
         print('I got a lemma!')
         print(lemma)
         
     else:
         print('Error! Tag not found!')
         print(word)
-        
-    noun_lemmas.close()
-    verb_lemmas.close()
-    prep_lemmas.close()
-    adv_lemmas.close()
-    print('I closed all lemmas files!')
-    
-                                  
+   
 def search_highlighted(url: str, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
     '''
     This function searches all highlighted words and makes constructions
@@ -188,6 +166,7 @@ req(
 7)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
 'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= '
+
 
 
 
