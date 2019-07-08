@@ -6,15 +6,17 @@ from collections import OrderedDict
 from lxml import html
 import time
 
-# search link for a word
-word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&text=word-info&requestid=1553071332398&language=ru&source='
-# tuple that contains information about word and the word itself
-Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
-Constructions = open('Constructions.txt', 'w')
-Constructions.close()
-global_dict = {}
-PAUSE_AFTER_FAILURE = 3
-MAX_RETRY = 3
+if __name__ == '__main__':
+    # search link for a word
+    word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&text=word-info&requestid=1553071332398&language=ru&source='
+    # tuple that contains information about word and the word itself
+    Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
+    Constructions = open('Constructions.txt', 'w')
+    Constructions.close()
+    global_dict = {}
+    PAUSE_AFTER_FAILURE = 3
+    MAX_RETRY = 3
+    
 
 def get_lemma_and_params(suff: str):
     '''
@@ -166,6 +168,7 @@ req(
 7)
 # http://search1.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=
 'http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4= '
+
 
 
 
