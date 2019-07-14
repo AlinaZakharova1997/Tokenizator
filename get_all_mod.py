@@ -163,7 +163,5 @@ def req(main_link, pages):
             writer.writerow([key,value])         
     
     
-req('http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=50&spd=100&spp=500&seed=10330&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
+req('http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=50&spd=100&spp=100&seed=24208&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
     13)                    
-
-
