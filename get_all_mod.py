@@ -22,6 +22,10 @@ MAX_RETRY = 3
 log_file = open('ruscorpora.log', 'w')
            
 def log(*args):
+    '''
+    This function writes information in file and also prints it on the screen
+    @param *args: arguments the function takes; the number of arguments is not limited
+    ''' 
     log_file.write(' '.join(str(arg) for arg in args))
     log_file.write('\n')
     log_file.flush()
@@ -65,22 +69,18 @@ def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_d
             s_freq_dict.setdefault(lemma, 0)
             s_freq_dict[lemma] += 1
             
-        
         elif  'pr' in pr_set:
             pr_freq_dict.setdefault(lemma, 0)
             pr_freq_dict[lemma] += 1
-           
       
         elif 'v' in pr_set:
             v_freq_dict.setdefault(lemma, 0)
             v_freq_dict[lemma] += 1
-            
        
         elif 'adv'in pr_set:
             adv_freq_dict.setdefault(lemma, 0)
             adv_freq_dict[lemma] += 1
             
-        
         else:
             log('Error! Tag not found!')
             log(word)
@@ -139,7 +139,6 @@ def req(main_link, pages):
             except OSError:
                 time.sleep(PAUSE_AFTER_FAILURE)
                 log('BAD OSError happened!')
-              
                 
     pr_freq_dict_sorted = OrderedDict(sorted(pr_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Prep_dict.csv', 'w') as csv_file:
@@ -161,7 +160,6 @@ def req(main_link, pages):
         writer = csv.writer(csv_file, delimiter= ';')
         for key, value in adv_freq_dict_sorted.items():
             writer.writerow([key,value])         
-    
-    
+      
 req('http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=50&spd=100&spp=100&seed=24208&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
     13)                    
