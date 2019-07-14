@@ -98,9 +98,6 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dic
     parsed_url = html.parse(url)
     constr_str = []
     Constructions = open('Constructions.txt', 'a')
-    '''/html/body/div[4]/ol/li[1]/table/tbody/tr/td/ul/li[1]
-    document.querySelector('body > div.content > ol > li:nth-child(1) > table > tbody > tr > td > ul > li:nth-child(1) > span:nth-child(8)')
-    '''
     log(len(parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'))) 
     for num, sent in enumerate (parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li')):
         constr = ''
