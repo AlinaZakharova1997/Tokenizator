@@ -39,15 +39,21 @@ def get_lemma_and_params(suff):
     ''' 
     parsed_url = html.parse(word_search_link + suff)
     info = parsed_url.xpath('//td[@class="value"]/text()')
-    if len(info) > 0:
+    if len(info) < 2:
+        try:
+            log('Failed to find lemma and params, sorry:(')
+            log(html.tostring(parsed_url))
+        except Exception:
+            raise
+    else:
         try:
             lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
             params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
             return lemma, params
         except IndexError:
             log('Bad IndexError happened!')
-    else:
-        log('Failed to find lemma and params, sorry:(')
+       
+            
           
 def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
     '''
@@ -98,6 +104,9 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dic
     parsed_url = html.parse(url)
     constr_str = []
     Constructions = open('Constructions.txt', 'a')
+    '''/html/body/div[4]/ol/li[1]/table/tbody/tr/td/ul/li[1]
+    document.querySelector('body > div.content > ol > li:nth-child(1) > table > tbody > tr > td > ul > li:nth-child(1) > span:nth-child(8)')
+    '''
     log(len(parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'))) 
     for num, sent in enumerate (parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li')):
         constr = ''
