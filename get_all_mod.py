@@ -17,7 +17,7 @@ word_search_link = 'http://search1.ruscorpora.ru/syntax-explain.xml?env=alpha&my
 # tuple that contains information about word and the word itself
 Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
 global_dict = {}
-PAUSE_AFTER_FAILURE = 3
+PAUSE_AFTER_FAILURE = 6
 MAX_RETRY = 3
 log_file = open('ruscorpora.log', 'w')
            
@@ -47,8 +47,10 @@ def get_lemma_and_params(suff):
             raise
     else:
         try:
-            lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '') 
-            params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
+            lemma = bytes([ord(c) for c in info[0]]).decode('utf-8').replace(' ', '').replace('\n(', '')
+            log(lemma, 'lemma')
+            params = bytes([ord(c) for c in info[2]]).decode('cp1251')
+            log(params, 'params')
             return lemma, params
         except IndexError:
             log('Bad IndexError happened!')
@@ -104,9 +106,6 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dic
     parsed_url = html.parse(url)
     constr_str = []
     Constructions = open('Constructions.txt', 'a')
-    '''/html/body/div[4]/ol/li[1]/table/tbody/tr/td/ul/li[1]
-    document.querySelector('body > div.content > ol > li:nth-child(1) > table > tbody > tr > td > ul > li:nth-child(1) > span:nth-child(8)')
-    '''
     log(len(parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li'))) 
     for num, sent in enumerate (parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li')):
         constr = ''
@@ -115,12 +114,14 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dic
         full_sent = sent.xpath('normalize-space(.)').split(' [', 1)[0]
         for highlighted_word in sent.xpath('span[@class="b-wrd-expl g-em"]'):
             word = highlighted_word.xpath('text()')
+            word = bytes([ord(c) for c in word]).decode('utf-8') 
             suff = highlighted_word.xpath('@explain')
             if len(word)==0 or len(suff)==0:
                 log('No such word or suff')
             else:
                 get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict)
                 constr+=word[0]+' '
+        '''constr = bytes([ord(c) for c in constr]).decode('utf-8')'''     
         log(constr)
         Constructions.write(constr + '\n')
     Constructions.close()   
@@ -167,5 +168,5 @@ def req(main_link, pages):
         for key, value in adv_freq_dict_sorted.items():
             writer.writerow([key,value])         
       
-req('http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=50&spd=100&spp=100&seed=24208&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4=',
-    13)                    
+req('http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=100&spd=100&spp=50&seed=14942&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=S&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4='
+    ,7)
