@@ -29,14 +29,33 @@ def log(*args):
     log_file.write(' '.join(str(arg) for arg in args))
     log_file.write('\n')
     log_file.flush()
-    print(*args)
+    '''print(*args)'''
     
-def get_lemma_and_params(suff):
-    '''
+'''def get_lemma_and_params(suff):
+    
     This function gets lemma and params with gram info
     @param suff:string containing search suffix to find a word
     @return: lemma and params
-    ''' 
+    
+    parsed_url = html.parse(word_search_link + suff)
+    info = parsed_url.xpath('//td[@class="value"]/text()')
+    if len(info) < 2:
+        try:
+            log('Failed to find lemma and params, sorry:(')
+            log(html.tostring(parsed_url))
+        except Exception:
+            raise
+    else:
+        try:
+            lemma = codecs.decode(info[0].encode('raw-unicode-escape'), 'cp1251').replace(' ', '').replace('\n(', '')
+            log(lemma, 'lemma')
+            params = codecs.decode(info[2].encode('raw-unicode-escape'), 'cp1251')
+            log(params, 'params')
+            return lemma, params
+        except IndexError:
+            log('Bad IndexError happened!') '''
+
+def get_lemma_and_params(suff):
     parsed_url = html.parse(word_search_link + suff)
     info = parsed_url.xpath('//td[@class="value"]/text()')
     if len(info) < 2:
@@ -54,7 +73,7 @@ def get_lemma_and_params(suff):
             return lemma, params
         except IndexError:
             log('Bad IndexError happened!')
-       
+          
             
           
 def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dict):
@@ -114,6 +133,7 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, adv_freq_dic
         full_sent = sent.xpath('normalize-space(.)').split(' [', 1)[0]
         for highlighted_word in sent.xpath('span[@class="b-wrd-expl g-em"]'):
             word = highlighted_word.xpath('text()')
+            word = ''.join(word)
             word = bytes([ord(c) for c in word]).decode('utf-8') 
             suff = highlighted_word.xpath('@explain')
             if len(word)==0 or len(suff)==0:
@@ -168,5 +188,5 @@ def req(main_link, pages):
         for key, value in adv_freq_dict_sorted.items():
             writer.writerow([key,value])         
       
-req('http://search1.ruscorpora.ru/syntax.xml?out=normal&kwsz=4&dpp=100&spd=100&spp=50&seed=14942&env=alpha&mycorp=&mysent=&mysize=&mysentsize=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=S&flags1=&parent2=1&level2=1&min2=1&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=3&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4='
+req('http://processing.ruscorpora.ru/syntax.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&text=lexgramm&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V%2C%D0%BF%D1%80%D0%B8%D1%87&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=A&flags2=&parent3=1&level3=1&min3=1&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&parent4=3&level4=2&min4=1&max4=&link4=on&type4=&lex4=&gramm4=S&flags4='
     ,7)
