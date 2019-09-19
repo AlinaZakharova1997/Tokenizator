@@ -11,8 +11,8 @@ import re
 
 
 # make a pattern for re.match()
-PATTERN_RIGHT = re.compile(r'[.!?] [A-ZА-Я]') 
-PATTERN_LEFT = re.compile(r'[A-ZА-Я] [.!?]')
+PATTERN_RIGHT = re.compile(r'[\.!?] A-ZА-Я]') 
+PATTERN_LEFT = re.compile(r'[A-ZА-Я] [\.!?]')
 
 class Context_Window(object):
     """
