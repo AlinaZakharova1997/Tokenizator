@@ -11,7 +11,6 @@ import search
 from search import SearchEngine
 
 class TestMyCode(unittest.TestCase):
-    
     def setUp(self):
         self.maxDiff = None
         self.window = Context_Window('The girl named Alina Zakharova is a student',[Position_Plus(0, 4, 20),Position_Plus(0, 9, 30)],8,20)
@@ -194,8 +193,22 @@ class TestMyCode(unittest.TestCase):
         window.extend_window()
         extended_window = Context_Window('Alina Zakharova is a student!!',[Position_Plus(0, 6, 15)], 0, 30)
         self.assertEqual(window, extended_window)
-        os.remove('test_extend_window.txt') 
+        os.remove('test_extend_window.txt')
         
+    def test_extend_window_rus(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_extend_window_rus.txt', 'w') 
+        test_file_one.write('Прогать очень сложно! Алина Захарова студент лингвист!! Аня любит немецкий. В Петербурге идет дождь.')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_extend_window_rus.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        window = windows.Context_Window.get_window('test_extend_window_rus.txt', Position_Plus(0, 28, 36), 1)
+        window.extend_window()
+        extended_window = Context_Window('Прогать очень сложно! Алина Захарова студент лингвист!! Аня любит немецкий. В Петербурге идет дождь.',[Position_Plus(0, 28, 36)], 21, 56)
+        self.assertEqual(window, extended_window)
+        os.remove('test_extend_window_rus.txt')          
+
     def test_already_extended_window(self):
         self.indexator = Indexer('database')
         test_file_one = open('test_already_extended_window.txt', 'w') 
@@ -227,6 +240,3 @@ class TestMyCode(unittest.TestCase):
         
 if __name__ == '__main__':
     unittest.main()
-
-   
-        
