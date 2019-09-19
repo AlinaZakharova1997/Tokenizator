@@ -84,17 +84,16 @@ class SearchEngine(object):
             raise TypeError('Input has an unappropriate type!')
       
        output_dict = {}
-       win_array = []
+       
        # value is an array of positions
        for key,value in dictionary.items():
+           # создаем список каждый раз, чтобы у каждого окна был свой список позиций  
+           win_array = output_dict.setdefault(key, [])
            pos_array = value
            # for each position in values get window()
            for pos in pos_array:
                window = Context_Window.get_window(key, pos, win_size)
-               win_array.append(window)
-           # add key and win_array into output_dict    
-           output_dict.setdefault(key, win_array)
-           
+               win_array.append(window) 
        i = 0
        for key, win_array in output_dict.items():
            while i < len(win_array)-1:
@@ -153,4 +152,5 @@ class SearchEngine(object):
             for window in value:
                 string = window.highlight_window()
                 output_dict.setdefault(key, []).append(string)
-        return output_dict   
+        return output_dict  
+
