@@ -11,8 +11,8 @@ import re
 
 
 # make a pattern for re.match()
-PATTERN_RIGHT = re.compile(r'[\.!?] A-ZА-Я]') 
-PATTERN_LEFT = re.compile(r'[A-ZА-Я] [\.!?]')
+PATTERN_RIGHT = re.compile(r'[\.!?]* [A-ZА-Я]') 
+PATTERN_LEFT = re.compile(r'[A-ZА-Я] [\.!?]*')
 
 class Context_Window(object):
     """
@@ -117,16 +117,16 @@ class Context_Window(object):
         '''
         This function extends a given window to sentence
         @return: an extended window
-        ''' 
+        '''
         to_right = self.string[self.win_end+1:]
         print(to_right, 'to right')
         to_left = self.string[:self.win_start+1][::-1]
         print(to_left, 'to left')
         left = PATTERN_LEFT.search(to_left)
         right = PATTERN_RIGHT.search(to_right)
+        print(right, 'right')
         if right is not None:
-            self.win_end += right.end()
-            print(right, 'right')
+             self.win_end += right.end()
         else:
             self.win_end = len(self.string)
         if left is not None:
@@ -135,9 +135,7 @@ class Context_Window(object):
             print( self.win_start, ' self.win_start')
         else:
             self.win_start = 0
-       
-                
-
+            
     def highlight_window(self):
         '''
         This function takes a substring of window string,
@@ -168,4 +166,5 @@ if __name__ == '__main__':
     print(window_X.win_start, 'start')
    
    
+
 
