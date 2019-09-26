@@ -205,9 +205,8 @@ class TestMyCode(unittest.TestCase):
         self.search = SearchEngine('database')
         window = windows.Context_Window.get_window('test_extend_window_rus.txt', Position_Plus(0, 28, 36), 1)
         window.extend_window()
-        extended_window = Context_Window('Прогать очень сложно! Алина Захарова студент лингвист!! Аня любит немецкий. В Петербурге идет дождь.',[Position_Plus(0, 28, 36)], 21, 56)
+        extended_window = Context_Window('Прогать очень сложно! Алина Захарова студент лингвист!! Аня любит немецкий. В Петербурге идет дождь.',[Position_Plus(0, 28, 36)], 22, 56)
         self.assertEqual(window, extended_window)
-        os.remove('test_extend_window_rus.txt')          
 
     def test_already_extended_window(self):
         self.indexator = Indexer('database')
