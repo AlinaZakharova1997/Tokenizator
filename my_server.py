@@ -38,7 +38,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 <html>
                     <body>
                         <form method="post">
-                            <input type="text" name="query" value = “%s”/>
+                            <input type="text" name="query" value = "%s"/>
                             <input type="submit" value="Search">
                         </form>
                  """ % query, encoding="utf-8"))
