@@ -66,7 +66,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                             <label for="offset">
                             Start from doc number
                             <input type="number" name="offset" value="%d"/>
-                            </label>
+                            </label>     
+                        </form>
+                    </body>
+                </html>
                 """ % (query,limit,offset), encoding="utf-8"))
         # the beginning of ordered list
         self.wfile.write(bytes('<ol>', encoding="utf-8")) 
@@ -83,7 +86,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(bytes('</ul>', encoding="utf-8"))
             if number == limit:
                 break
-        self.wfile.write(bytes("""</ol></form></body></html>""", encoding="utf-8"))
+        self.wfile.write(bytes("""</ol></body></html>""", encoding="utf-8"))
 
 
 def main():
