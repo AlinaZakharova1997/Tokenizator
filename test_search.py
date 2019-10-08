@@ -250,7 +250,7 @@ class TestMyCode(unittest.TestCase):
        os.remove('test_qulim_search_one.txt')
        os.remove('test_qulim_search_two.txt')
 
-    def test_qulim_search_empty (self):
+    def test_qulim_search_empty(self):
        test_file_one = open('test_qulim_search_one.txt', 'w') 
        test_file_one.write('Alina Zakharova is a student!! /n Zakharova tries to write programs /n Python is easy, Zakharova, keep calm!!!'')
        test_file_one.close()
