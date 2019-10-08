@@ -19,13 +19,15 @@ class RequestHandler(BaseHTTPRequestHandler):
                         <form method="post">
                             <input type="text" name="query">
                             <input type="submit" value="Search">
+                            <br>
+                            <br>
                             <label for="limit">
                             Docs per page
-                            <input type="number" name="limit">
+                            <input type="number" name="limit"  placeholder="limit">
                             </label>
                             <label for="offset">
                             Start from doc number
-                            <input type="number" name="offset">
+                            <input type="number" name="offset"  placeholder="offset">
                             </label>
                         </form>
                     </body>
@@ -42,7 +44,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         query = str(form.getvalue('query'))
         limit = int(form.getvalue('limit'))
         if not limit:
-            limit = 15
+            limit = 5
         offset = int(form.getvalue('offset'))
         if not offset:
             offset = 0
@@ -59,34 +61,33 @@ class RequestHandler(BaseHTTPRequestHandler):
                         <form method="post">
                             <input type="text" name="query" value="%s"/>
                             <input type="submit" value="Search"/>
+                            <br>
+                            <br>
                             <label for="limit">
                             Docs per page
-                            <input type="number" name="limit" value="%d"/>
+                            <input type="number" name="limit" placeholder="limit" value="%d"/>
                             </label>
                             <label for="offset">
                             Start from doc number
-                            <input type="number" name="offset" value="%d"/>
-                            </label>     
-                        </form>
-                    </body>
-                </html>
+                            <input type="number" name="offset" placeholder="offset"value="%d"/>
+                            </label>
                 """ % (query,limit,offset), encoding="utf-8"))
         # the beginning of ordered list
         self.wfile.write(bytes('<ol>', encoding="utf-8")) 
         if not final:
             self.wfile.write(bytes('NOT FOUND, SORRY', encoding="utf-8"))
         for number,filename in enumerate (final):
-            if number == offset and number < limit:
-                self.wfile.write(bytes('<li><p> %s </p></li>' % filename, encoding ="utf-8"))
+            if number >= offset and number < limit+offset:
+                self.wfile.write(bytes('<li><p>%s</p>' % filename, encoding ="utf-8"))
                 # the beginning of unordered list
                 self.wfile.write(bytes('<ul>', encoding="utf-8"))
                 for window in final[filename]:
                     hi_str = window.highlight_window()
-                    self.wfile.write(bytes('<li><p> %s </p></li>' % hi_str, encoding="utf-8"))
+                    self.wfile.write(bytes('<li><p>%s</p></li>' % hi_str, encoding="utf-8"))
                 self.wfile.write(bytes('</ul>', encoding="utf-8"))
-            if number == limit:
+            if number == limit+offset:
                 break
-        self.wfile.write(bytes("""</ol></body></html>""", encoding="utf-8"))
+        self.wfile.write(bytes("""</ol</form></body></html>""", encoding="utf-8"))
 
 
 def main():
