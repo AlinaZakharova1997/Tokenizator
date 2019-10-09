@@ -153,4 +153,41 @@ class SearchEngine(object):
                 string = window.highlight_window()
                 output_dict.setdefault(key, []).append(string)
         return output_dict  
-
+    
+    def qulim_search(self, query, win_size, limit, offset, doc_limof):
+        ''' надо сразу задать значения по умолчанию? или нет?
+                     limit = 5, offset = 0,
+                     doc_limof = [(3,0),(3,0),(3,0),(3,0),(3,0)]'''
+        '''
+        This function performs searching a query in database and returs
+        a dictionary filemname:query in string format
+        @param query: query to search
+        @param win_size: a size of a context window
+        @param limit: max number of documents to show
+        @param offset: document number to start with
+        @param doc_limof: list of pairs that show limit and offset of each concrete document,
+        no more quotes can be shown than this doclimit
+        @return: dictionary {filename: [query(str)]}
+        '''
+        if not isinstance(query, str) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type!')
+        
+        output_dict = {}
+        qunum = 0
+        dictionary = self.unite_extended(query, win_size)
+        final = sorted(dictionary)
+        for number, filename in enumerate(final):
+            if number == limit + offset:
+                break;
+            if number >= offset and number < limit + offset:
+                # get all the qoutes in file
+                all_quotes  = dictionary[filename]
+                qulim = doc_limof[qunum][0]
+                quset = doc_limof[qunum][1]
+                for num, quote in enumerate (all_quotes):
+                    if num == qulim + quset:
+                        break;
+                    if num >= quset and num < qulim + quset:
+                         output_dict.setdefault(filename,[]).append(quote.highlight_window())
+                qunum += 1          
+        return output_dict  
