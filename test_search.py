@@ -139,7 +139,7 @@ class TestMyCode(unittest.TestCase):
         with self.assertRaises(TypeError):
              self.search.unite_all(12, 'window)))')
 
-    def test_unite_all(self):
+    def test_unite_all_one(self):
         test_file = open('test_unite_all.txt', 'w') 
         test_file.write('Alina Zakharova is a student')
         test_file.close()
@@ -163,21 +163,30 @@ class TestMyCode(unittest.TestCase):
         test_file = open('test_unite_all.txt', 'w') 
         test_file.write('Alina Zakharova is a student')
         test_file.close()
+        test_file_one = open('test_unite_all_one.txt', 'w') 
+        test_file_one.write('Little Zakharova loves big apples')
+        test_file_one.close()
         self.indexator.get_index_with_line('test_unite_all.txt')
+        self.indexator.get_index_with_line('test_unite_all_one.txt')
         del self.indexator
         self.search = SearchEngine('database')
-        dictionary = self.search.get_dict_many_tokens('Alina Zakharova is a student')
-        input_dictionary = {'test_unite_all.txt':[Position_Plus(0, 0, 5),Position_Plus(0, 6, 15),
+        dictionary = {'test_unite_all.txt':[Position_Plus(0, 0, 5),Position_Plus(0, 6, 15),
                                                   Position_Plus(0, 16, 18),Position_Plus(0, 19, 20),
-                                                  Position_Plus(0, 21, 28)]}
-        self.assertEqual(dictionary, input_dictionary)
-        dict_to_function =   self.search.unite_all(dictionary, 1)
+                                                  Position_Plus(0, 21, 28)],
+                      'test_unite_all_one.txt':[Position_Plus(0, 0, 6),Position_Plus(0, 7, 16),
+                                                Position_Plus(0, 17, 22), Position_Plus(0, 23, 26),
+                                                Position_Plus(0, 27, 33)]}
+        dict_to_function = self.search.unite_all(dictionary, 1)
         output_dict = {'test_unite_all.txt':[Context_Window('Alina Zakharova is a student',[Position_Plus(0, 0, 5), Position_Plus(0, 6, 15),
                                                                                             Position_Plus(0, 16, 18), Position_Plus(0, 19, 20),
-                                                                                            Position_Plus(0, 21, 28)], 0, 28)]}
+                                                                                            Position_Plus(0, 21, 28)], 0, 28)],
+                       'test_unite_all_one.txt':[Context_Window('Little Zakharova loves big apples',[Position_Plus(0, 0, 6),Position_Plus(0, 7, 16),
+                                                                                                     Position_Plus(0, 17, 22), Position_Plus(0, 23, 26),
+                                                                                                     Position_Plus(0, 27, 33)], 0, 33)]}
                                             
         self.assertEqual(dict_to_function, output_dict)
         os.remove('test_unite_all.txt')
+        os.remove('test_unite_all_one.txt')
 
     def test_unite(self):
         test_file = open('test_unite.txt', 'w') 
@@ -215,7 +224,7 @@ class TestMyCode(unittest.TestCase):
                                                                                             Position_Plus(0, 21, 28)], 0, 30)]}
         self.assertEqual(result, fine_result)
         os.remove('test_unite_extended.txt')
-        
+   
     def test_query_search(self):
        test_file_one = open('test_query_search.txt', 'w') 
        test_file_one.write('Alina Zakharova is a student!!')
@@ -228,13 +237,32 @@ class TestMyCode(unittest.TestCase):
        fine_result = {'test_query_search.txt':['Alina <b>Zakharova</b> is a student!!']}
        self.assertEqual(result, fine_result)
        os.remove('test_query_search.txt')
-    
+
+    def test_query_two_files(self):
+       test_file_one = open('test_query_search_one.txt', 'w') 
+       test_file_one.write('Alina Zakharova is a student!!')
+       test_file_one.close()
+       test_file_two = open('test_query_search_two.txt', 'w') 
+       test_file_two.write('Little Zakharova loves big apples')
+       test_file_two.close()
+       self.indexator.get_index_with_line('test_query_search_one.txt')
+       self.indexator.get_index_with_line('test_query_search_two.txt')
+       del self.indexator
+       self.search = SearchEngine('database')
+       query = 'Zakharova'
+       result = self.search.query_search(query, 1)
+       fine_result = {'test_query_search_one.txt':['Alina <b>Zakharova</b> is a student!!'],
+                      'test_query_search_two.txt':['Little <b>Zakharova</b> loves big apples']}
+       self.assertEqual(result, fine_result)
+       os.remove('test_query_search_one.txt')
+       os.remove('test_query_search_two.txt')   
+       
     def test_qulim_search(self):
        test_file_one = open('test_qulim_search_one.txt', 'w') 
-       test_file_one.write('Alina Zakharova is a student!! Zakharova tries to write programs. Python is easy, Zakharova, keep calm!!!')
+       test_file_one.write('Alina Zakharova is a student!! We are gonna rock, we are gonna rock around the clock tonight. Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
        test_file_one.close()
        test_file_two = open('test_qulim_search_two.txt', 'w') 
-       test_file_two.write('Little Zakharova loves big apples. Also Zakharova loves rock music.')
+       test_file_two.write('Little Zakharova loves big apples. Also student Alina Zakharova loves rock music.')
        test_file_two.close()
        self.indexator.get_index_with_line('test_qulim_search_one.txt')
        self.indexator.get_index_with_line('test_qulim_search_two.txt')
@@ -242,12 +270,32 @@ class TestMyCode(unittest.TestCase):
        self.search = SearchEngine('database')
        query = 'Zakharova'
        result = self.search.qulim_search(query, win_size=1, limit=2, offset=0, doc_limof =[(3,1), (3,1)] )
-       fine_result = {'test_qulim_search_one.txt':['<b>Zakharova</b> tries to write programs.',
-                                                   'Python is easy, <b>Zakharova</b>, keep calm!!!'],
-                      'test_qulim_search_two.txt':['Also <b>Zakharova</b> loves rock music.']}
+       fine_result = {'test_qulim_search_one.txt':['Smart Student Alina <b>Zakharova</b> tries to write programs.',
+                                                   'Python is easy, <b>Zakharova</b>, keep calm caaalm!!!'],
+                      'test_qulim_search_two.txt':['Also student Alina <b>Zakharova</b> loves rock music.']}
        self.assertEqual(result, fine_result)
        os.remove('test_qulim_search_one.txt')
        os.remove('test_qulim_search_two.txt')
+       
+    def test_qulim_search_one(self):
+       test_file_one = open('test_qulim_search_one.txt', 'w') 
+       test_file_one.write('Smart Student Alina Zakharova is a linguist!! We are gonna rock, we are gonna rock around the clock tonight. Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
+       test_file_one.close()
+       test_file_two = open('test_qulim_search_two.txt', 'w') 
+       test_file_two.write('Little Zakharova loves big apples. Also student Alina Zakharova loves rock music.')
+       test_file_two.close()
+       self.indexator.get_index_with_line('test_qulim_search_one.txt')
+       self.indexator.get_index_with_line('test_qulim_search_two.txt')
+       del self.indexator
+       self.search = SearchEngine('database')
+       query = 'Zakharova'
+       result = self.search.qulim_search(query, win_size=1, limit=2, offset=0, doc_limof =[(2,0), (3,3)] )
+       fine_result = {'test_qulim_search_one.txt':['Smart Student Alina <b>Zakharova</b> is a linguist!!',
+                                                   'Smart Student Alina <b>Zakharova</b> tries to write programs.'],
+                      'test_qulim_search_two.txt': []}
+       self.assertEqual(result, fine_result)
+       os.remove('test_qulim_search_one.txt')
+       os.remove('test_qulim_search_two.txt')   
 
     def test_qulim_search_empty(self):
         test_file_one = open('test_qulim_search_one.txt', 'w') 
@@ -271,4 +319,5 @@ class TestMyCode(unittest.TestCase):
        
 if __name__ == '__main__':
     unittest.main()        
+
 
