@@ -1,3 +1,30 @@
+# для кодировок
+import codecs
+# для работы с тьюплами
+from collections import namedtuple
+# определяет функции и классы, которые помогают открывать URL
+from urllib.request import urlopen
+# для работы с csv
+import csv
+# для сортировки словарей
+from collections import OrderedDict
+from lxml import html
+# модуль для работы со временем 
+import time
+# множество функций для работы с операционной системой
+import os
+# предоставляет классы для обработки времени и даты разными способами
+import datetime
+# для декодирования суффикса
+from urllib.parse import unquote
+
+if __name__ == '__main__':
+   ''' # создаю файл для конструкций 
+    Constructions = open('Constructions.txt', 'w')
+    # потом я его открою на дозапись и буду по очереди дозаписывать все конструкции
+    Constructions.close()'''
+# это ссылка для поиска слова
+word_search_link = 'http://processing.ruscorpora.ru/search-explan.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&text=word-info&requestid=1569187164845&language=ru&source='
 # это тьюпл для хранения информации о слове и самого слова
 Word = namedtuple("Word", "word lemma part_of_speech grammar_structure")
 # глобальный словарь, играющий роль промежуточного хранилища 
@@ -124,8 +151,8 @@ def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dic
 def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, constr_dict):
     '''
     This function searches all highlighted words and makes constructions
+    and forms constr_dict={'construction':[lemma0,lemma1,lemma2,lemma3]}
     @param url: string adress of a searching query
-    @return: csv file with constructions
     '''
     log('search')
     # парсю ссылку
@@ -139,6 +166,8 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict,
     for num, sent in enumerate (parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li')):
         # пустая сторока куда буду плюсовать слова в конструкцию
         constr = ''
+        # список всех лемм конструкции
+        lemmas = []
         log(num, 'sent_num')
         # слежу за временем обработки предложения
         log(datetime.datetime.now().isoformat())
@@ -152,11 +181,21 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict,
             # достаю слово в виде текста
             word = highlighted_word.xpath('text()')
             word = ''.join(word)
-            #  декодирую в ютф-8
+            # декодирую в ютф-8
             word = bytes([ord(c) for c in word]).decode('utf-8')
             '''log(word, "word_decoded")'''
             # нахожу грамматические характеристики слова, они же suff
             suff = highlighted_word.xpath('@explain')
+            # вытаскиваю суффикс
+            lem_suff = suff[0] # %D0%B2%7C5%7C%D0%B2
+            # декодирую суффикс
+            lem_suff = unquote(lem_suff)
+            '''print(type(lem_suff),'type')
+            print(lem_suff,'suff')'''
+            # сплит вернет список, где 1 элемент это моя лемма
+            lemma = lem_suff.split('|')[0]
+            log(lemma,"lemma")
+            lemmas.append(lemma)
             # если то, что я нашла не пустой результат поиска, передаю
             # грамматические характеристики и пустые словари в функцию поиска нужных характеристик(частеречных тегов)
             if len(word)==0 or len(suff)==0:
@@ -167,14 +206,15 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict,
                 time.sleep(3)
                 # собираю слова в конструкцию
                 constr+=word+' '
-
-               
-        '''constr = bytes([ord(c) for c in constr]).decode('utf-8')'''     
         log(constr, "CONSTR!")
-        # добавляю констрцукцию в результирующий файл
-        Constructions.write(constr + '\n')
-    # не забываю закрыть файл, чтобы потом снова открыть и дозаписать новую конструкцию без утраты старой    
-    Constructions.close()   
+        log (lemmas, "Lemmas!")
+        '''print(constr)'''
+        # добавляю в словарь конструкцию и список ее лемм
+        constr_dict.setdefault(constr, []).append(lemmas)
+        '''# добавляю констрцукцию в результирующий файл
+        Constructions.write(constr + '\n')'''
+    '''# не забываю закрыть файл, чтобы потом снова открыть и дозаписать новую конструкцию без утраты старой    
+    Constructions.close()'''   
     
 def req(main_link, pages):
     '''
@@ -220,7 +260,12 @@ def req(main_link, pages):
     with open('Verb_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
         for key, value in v_freq_dict_sorted.items():
-            writer.writerow([key,value]) 
+            writer.writerow([key,value])
+    constr_dict_sorted = OrderedDict(sorted(constr_dict.items(), key = lambda t: t[1], reverse=True))
+    with open('CONSTR_dict.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file, delimiter= ';')
+        for key, value in constr_dict_sorted.items():
+            writer.writerow([key,value])         
     '''adv_freq_dict_sorted = OrderedDict(sorted(adv_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Adverb_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
@@ -234,4 +279,3 @@ def req(main_link, pages):
 # это моя ссылка поиска и количество страниц выдачи      
 req('http://processing.ruscorpora.ru/search.xml?sort=i_grtagging&out=normal&dpp=100&spd=10&seed=5678&text=lexgramm&mysent=&level1=0&level2=1&level3=1&level4=2&type4=&flags2=&type3=&type2=&flags4=&flags1=&flags3=&mysize=&mysentsize=&simple=1&env=alpha&parent2=1&link4=on&link3=on&link2=on&gramm4=S&gramm1=V&gramm2=S&gramm3=PR&min2=&min3=1&min4=1&lang=ru&lex4=&lex1=&lex3=&max2=&max3=&lex2=&mycorp=&max4=&notag=1&parent4=3&parent3=1&mode=syntax&parent1=0'
     ,7)
-
