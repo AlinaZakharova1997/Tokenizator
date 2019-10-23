@@ -89,7 +89,7 @@ def get_lemma_and_params(suff):
     else:
         # тащу и декодирую лемму
         lemma = bytes([ord(c) for c in info[0]]).decode('utf-8').replace(' ', '').replace('\n(', '')
-        log(lemma, 'lemma')
+        '''log(lemma, 'lemma')'''
         # тащу и декодирую все грамматические характеристики 
         params = bytes([ord(c) for c in info[1]]).decode('utf-8').replace(' ', '').replace('\n(', '')
         log(params, 'params')
@@ -99,7 +99,7 @@ def get_lemma_and_params(suff):
           
             
           
-def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict):
+def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, adv_freq_dict):
     '''
     This function gets information about a given word and makes frequency dictionaries
     for each part of speech (noun, preposition, verb)
@@ -137,9 +137,13 @@ def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dic
             v_freq_dict[lemma] += 1
        
         elif 'adv'in pr_set:
-            a_freq_dict.setdefault(lemma, 0)
-            a_freq_dict[lemma] += 1
-            
+            adv_freq_dict.setdefault(lemma, 0)
+            adv_freq_dict[lemma] += 1
+
+        elif 'a' in pr_set:
+           a_freq_dict.setdefault(lemma, 0)
+           a_freq_dict[lemma] += 1
+           
         else:
             # на случай если тег не найден
             log('Error! Tag not found!')
@@ -148,7 +152,7 @@ def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dic
     except AssertionError:
        log('AssertionError')    
    
-def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, constr_dict):
+def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, constr_dict, adv_freq_dict):
     '''
     This function searches all highlighted words and makes constructions
     and forms constr_dict={'construction':[lemma0,lemma1,lemma2,lemma3]}
@@ -160,7 +164,7 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict,
     log('I parsed url')
     # создаю список конструкций и открываю файл на дозапись
     constr_str = []
-    Constructions = open('Constructions.txt', 'a')
+    '''Constructions = open('Constructions.txt', 'a')'''
     log(len(parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li')))
     # для каждого предложения из контента, те из документа на странице начинаю искать выделенные слова
     for num, sent in enumerate (parsed_url.xpath('//div[@class="content"]/ol/li/table/tr/td/ul/li')):
@@ -201,7 +205,7 @@ def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict,
             if len(word)==0 or len(suff)==0:
                 log('No such word or suff')
             else:
-                get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict)
+                get_word_info(word[0], suff[0], s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, adv_freq_dict)
                 # не забываю отдыхать
                 time.sleep(3)
                 # собираю слова в конструкцию
@@ -226,6 +230,7 @@ def req(main_link, pages):
     pr_freq_dict = {}
     v_freq_dict = {}
     a_freq_dict = {}
+    adv_freq_dict = {}
     constr_dict = {}
     log('req')
     # листаю страницы выдачи, запоминаю их номера
@@ -236,7 +241,7 @@ def req(main_link, pages):
             try:
                 #  если получилось, пытаюсь найти все выделенные цветом слова - они мои будущие конструкции
                 '''log('I try to search highlighted!')'''
-                all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, constr_dict)
+                all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, constr_dict, adv_freq_dict)
                 '''log('I got the link!')'''
                 break
             except:
@@ -266,16 +271,16 @@ def req(main_link, pages):
         writer = csv.writer(csv_file, delimiter= ';')
         for key, value in constr_dict_sorted.items():
             writer.writerow([key,value])         
-    '''adv_freq_dict_sorted = OrderedDict(sorted(adv_freq_dict.items(), key = lambda t: t[1], reverse=True))
+    adv_freq_dict_sorted = OrderedDict(sorted(adv_freq_dict.items(), key = lambda t: t[1], reverse=True))
     with open('Adverb_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
         for key, value in adv_freq_dict_sorted.items():
             writer.writerow([key,value])
     a_freq_dict_sorted = OrderedDict(sorted(a_freq_dict.items(), key = lambda t: t[1], reverse=True))
-    with open('Adverb_dict.csv', 'w') as csv_file:
+    with open('Adjective_dict.csv', 'w') as csv_file:
         writer = csv.writer(csv_file, delimiter= ';')
         for key, value in a_freq_dict_sorted.items():
-            writer.writerow([key,value])''' 
+            writer.writerow([key,value])
 # это моя ссылка поиска и количество страниц выдачи      
-req('http://processing.ruscorpora.ru/search.xml?sort=i_grtagging&out=normal&dpp=100&spd=10&seed=5678&text=lexgramm&mysent=&level1=0&level2=1&level3=1&level4=2&type4=&flags2=&type3=&type2=&flags4=&flags1=&flags3=&mysize=&mysentsize=&simple=1&env=alpha&parent2=1&link4=on&link3=on&link2=on&gramm4=S&gramm1=V&gramm2=S&gramm3=PR&min2=&min3=1&min4=1&lang=ru&lex4=&lex1=&lex3=&max2=&max3=&lex2=&mycorp=&max4=&notag=1&parent4=3&parent3=1&mode=syntax&parent1=0'
-    ,7)
+req('http://processing.ruscorpora.ru/search.xml?sort=i_grtagging&out=normal&dpp=100&spd=100&seed=9153&text=lexgramm&mysent=&level1=0&level2=1&level3=2&level4=3&type4=&flags2=&type3=&type2=&flags4=&flags1=&flags3=&mysize=&mysentsize=&simple=1&env=alpha&parent2=1&link4=on&link3=on&link2=on&gramm4=S&gramm1=S&gramm2=V%2C%D0%BF%D1%80%D0%B8%D1%87&gramm3=PR&min2=1&min3=1&min4=1&lang=ru&lex4=&lex1=&lex3=&max2=&max3=&lex2=&mycorp=&max4=&notag=1&parent4=3&parent3=2&mode=syntax&parent1=0'
+    ,6)
