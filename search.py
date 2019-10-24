@@ -135,7 +135,7 @@ class SearchEngine(object):
          
         return dictionary 
     
-    def query_search(self, query, win_size):
+    def query_search(self, query, win_size = 3):
         '''
         This function performs searching a query in database and returs
         a dictionary filemname:query in string format
@@ -154,7 +154,7 @@ class SearchEngine(object):
                 output_dict.setdefault(key, []).append(string)
         return output_dict  
 
-    def qulim_search(self, query, win_size, limit, offset, doc_limof):
+    def qulim_search(self, query, limit, offset, doc_limof, win_size = 3):
         '''
         This function performs searching a query in database and returs
         a dictionary filemname:query in string format
@@ -195,4 +195,3 @@ class SearchEngine(object):
                 qunum += 1          
         return output_dict  
         
-
