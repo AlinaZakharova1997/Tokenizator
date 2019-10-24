@@ -174,10 +174,11 @@ class SearchEngine(object):
         qunum = 0
         dictionary = self.unite_extended(query, win_size)
         for number, filename in enumerate(sorted(dictionary)):
-            output_dict[filename] = []
             if number == limit + offset:
                 break;
             if number >= offset and number < limit + offset:
+                # тут я создаю список для каждого файла
+                output_dict[filename] = []
                 # get all the qoutes in file
                 all_quotes  = dictionary[filename]
                 # limit for document
@@ -188,6 +189,8 @@ class SearchEngine(object):
                     if num == qulim + quset:
                         break;
                     if num >= quset and num < qulim + quset:
+                         print(quote,'quote')
+                         print(quote.highlight_window(),'highlight')
                          output_dict[filename].append(quote.highlight_window())
                 qunum += 1          
         return output_dict  
