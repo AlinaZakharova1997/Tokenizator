@@ -226,6 +226,8 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_unite_extended.txt')
    
     def test_query_search(self):
+       # этот тест проходит, значит тут все правильно
+       # и он может подсвечивать два слова из запроса из двух слов
        test_file_one = open('test_query_search.txt', 'w') 
        test_file_one.write('Alina Zakharova is a student!!')
        test_file_one.close()
@@ -326,6 +328,8 @@ class TestMyCode(unittest.TestCase):
        os.remove('test_qulim_search_three.txt')
        
     def test_qulim_search_three(self):
+        # здесь ошибка, подсвечивает только второе слово
+        # делает цитату всегда по одному слову
         test_file_one = open('test_qulim_search_one.txt', 'w') 
         test_file_one.write('Smart Student Alina Zakharova is a linguist!! We are gonna rock, we are gonna rock around the clock tonight. Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
         test_file_one.close()
