@@ -232,9 +232,9 @@ class TestMyCode(unittest.TestCase):
        self.indexator.get_index_with_line('test_query_search.txt')
        del self.indexator
        self.search = SearchEngine('database')
-       query = 'Zakharova'
+       query = 'Alina Zakharova'
        result = self.search.query_search(query, 1)
-       fine_result = {'test_query_search.txt':['Alina <b>Zakharova</b> is a student!!']}
+       fine_result = {'test_query_search.txt':['<b>Alina</b> <b>Zakharova</b> is a student!!']}
        self.assertEqual(result, fine_result)
        os.remove('test_query_search.txt')
 
@@ -295,7 +295,62 @@ class TestMyCode(unittest.TestCase):
                       'test_qulim_search_two.txt': []}
        self.assertEqual(result, fine_result)
        os.remove('test_qulim_search_one.txt')
-       os.remove('test_qulim_search_two.txt')   
+       os.remove('test_qulim_search_two.txt')
+
+
+    def test_qulim_search_two(self):
+       test_file_one = open('test_qulim_search_one.txt', 'w') 
+       test_file_one.write('Smart Student Alina Zakharova is a linguist!! We are gonna rock, we are gonna rock around the clock tonight. Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
+       test_file_one.close()
+       test_file_two = open('test_qulim_search_two.txt', 'w') 
+       test_file_two.write('Little Alina Zakharova loves big apples. Also student Alina Zakharova loves rock music.')
+       test_file_two.close()
+       test_file_three = open('test_qulim_search_three.txt', 'w') 
+       test_file_three.write('Beautiful Alina Zakharova loves sweets and black coffee. Also cute Alina Zakharova loves Disney cartoons.')
+       test_file_three.close()
+       self.indexator.get_index_with_line('test_qulim_search_one.txt')
+       self.indexator.get_index_with_line('test_qulim_search_two.txt')
+       self.indexator.get_index_with_line('test_qulim_search_three.txt')
+       del self.indexator
+       self.search = SearchEngine('database')
+       query = 'Zakharova'
+       result = self.search.qulim_search(query, win_size=1, limit=2, offset=1, doc_limof =[(2,0), (2,0)] )
+       fine_result = {
+                      'test_qulim_search_two.txt': ['Little Alina <b>Zakharova</b> loves big apples.',
+                                                    'Also student Alina <b>Zakharova</b> loves rock music.'],
+                      'test_qulim_search_three.txt':['Beautiful Alina <b>Zakharova</b> loves sweets and black coffee.',
+                                                     'Also cute Alina <b>Zakharova</b> loves Disney cartoons.']}
+       self.assertEqual(result, fine_result)
+       os.remove('test_qulim_search_one.txt')
+       os.remove('test_qulim_search_two.txt')
+       os.remove('test_qulim_search_three.txt')
+       
+    def test_qulim_search_three(self):
+        test_file_one = open('test_qulim_search_one.txt', 'w') 
+        test_file_one.write('Smart Student Alina Zakharova is a linguist!! We are gonna rock, we are gonna rock around the clock tonight. Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
+        test_file_one.close()
+        test_file_two = open('test_qulim_search_two.txt', 'w') 
+        test_file_two.write('Little funny girl Alina Zakharova loves big apples. Also student Alina Zakharova loves rock music.')
+        test_file_two.close()
+        test_file_three = open('test_qulim_search_three.txt', 'w') 
+        test_file_three.write('Beautiful and perfect Alina Zakharova loves sweets and black coffee. Also cute and nice Alina Zakharova loves Disney cartoons.')
+        test_file_three.close()
+        self.indexator.get_index_with_line('test_qulim_search_one.txt')
+        self.indexator.get_index_with_line('test_qulim_search_two.txt')
+        self.indexator.get_index_with_line('test_qulim_search_three.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        query = 'Alina Zakharova'
+        result = self.search.qulim_search(query, win_size=1, limit=2, offset=1, doc_limof =[(2,0), (2,0)] )
+        fine_result = {
+                      'test_qulim_search_two.txt': ['Little funny girl <b>Alina</b> <b>Zakharova</b> loves big apples.',
+                                                    'Also extra smart student <b>Alina</b> <b>Zakharova</b> loves rock music.'],
+                      'test_qulim_search_three.txt':['Beautiful and perfect <b>Alina</b> <b>Zakharova</b> loves sweets and black coffee.',
+                                                     'Also cute and nice <b>Alina</b> <b>Zakharova</b> loves Disney cartoons.']}
+        self.assertEqual(result, fine_result)
+        os.remove('test_qulim_search_one.txt')
+        os.remove('test_qulim_search_two.txt')
+        os.remove('test_qulim_search_three.txt')  
 
     def test_qulim_search_empty(self):
         test_file_one = open('test_qulim_search_one.txt', 'w') 
@@ -313,11 +368,11 @@ class TestMyCode(unittest.TestCase):
         fine_result = {}
         self.assertEqual(result, fine_result)
         os.remove('test_qulim_search_one.txt')
-        os.remove('test_qulim_search_two.txt')                       
+        os.remove('test_qulim_search_two.txt')
+        
 
                     
        
 if __name__ == '__main__':
     unittest.main()        
-
 
