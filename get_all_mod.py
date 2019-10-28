@@ -244,7 +244,12 @@ def req(main_link, pages):
                 all_highlighted = search_highlighted(main_link+'&p=%s' % i, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, constr_dict, adv_freq_dict)
                 '''log('I got the link!')'''
                 break
-            except:
+            # добавила после ошибки в 6 запросе
+            # программа доработала до функции get_word_info
+            # в лог файл напечаталась лемма и сообщение 'I am in word info!'
+            # http://processing.ruscorpora.ru/search-explan.xml?env=alpha&mycorp=&mysent=&mysize=&mysentsize=&dpp=&spp=&spd=&&mode=syntax&notag=1&simple=1&lang=ru&parent1=0&level1=0&lex1=&gramm1=V&flags1=&parent2=1&level2=1&min2=&max2=&link2=on&type2=&lex2=&gramm2=S&flags2=&parent3=2&level3=2&min3=&max3=&link3=on&type3=&lex3=&gramm3=PR&flags3=&text=word-info&requestid=1569187164845&language=ru&source=%D0%BE%D1%82%D1%82%D0%BE%D0%BA%7C53%7C%D0%BE%D1%82%D1%82%D0%BE%D0%BA
+            # эта ссылка была помечена как ошибка, ссылка рабочая. Сообщение: не удалось загрузить внешний элемент
+            except OSError:
                 raise
                 # если что то пошло не так, поднимаю ошибку и делаю паузу
                 time.sleep(PAUSE_AFTER_FAILURE)
@@ -282,5 +287,5 @@ def req(main_link, pages):
         for key, value in a_freq_dict_sorted.items():
             writer.writerow([key,value])
 # это моя ссылка поиска и количество страниц выдачи      
-req('http://processing.ruscorpora.ru/search.xml?sort=i_grtagging&out=normal&dpp=100&spd=100&seed=9153&text=lexgramm&mysent=&level1=0&level2=1&level3=2&level4=3&type4=&flags2=&type3=&type2=&flags4=&flags1=&flags3=&mysize=&mysentsize=&simple=1&env=alpha&parent2=1&link4=on&link3=on&link2=on&gramm4=S&gramm1=S&gramm2=V%2C%D0%BF%D1%80%D0%B8%D1%87&gramm3=PR&min2=1&min3=1&min4=1&lang=ru&lex4=&lex1=&lex3=&max2=&max3=&lex2=&mycorp=&max4=&notag=1&parent4=3&parent3=2&mode=syntax&parent1=0'
-    ,6)
+req('http://processing.ruscorpora.ru/search.xml?sort=i_grtagging&out=normal&dpp=100&spd=100&seed=7127&text=lexgramm&mysent=&level1=0&level2=1&level3=1&level4=2&type4=&flags2=&type3=&type2=&flags4=&flags1=&flags3=&mysize=&mysentsize=&simple=1&env=alpha&parent2=1&link4=on&link3=on&link2=on&gramm4=S&gramm1=S&gramm2=S&gramm3=PR&min2=&min3=1&min4=1&lang=ru&lex4=&lex1=&lex3=&max2=&max3=&lex2=&mycorp=&max4=&notag=1&parent4=3&parent3=1&mode=syntax&parent1=0'
+    ,7)
