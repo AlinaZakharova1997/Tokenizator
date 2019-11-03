@@ -148,9 +148,11 @@ def get_word_info(word, suff, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dic
             # на случай если тег не найден
             log('Error! Tag not found!')
             log(word)
-    # поднимаю ошибку    
+    # поднимаю ошибку. здесь так же возникает OSError, я ее обнаружила, когда качала запрос 5   
+    except OSError:
+       log('BAD OSError happened!')
     except AssertionError:
-       log('AssertionError')    
+       log('AssertionError')
    
 def search_highlighted(url, s_freq_dict, pr_freq_dict, v_freq_dict, a_freq_dict, constr_dict, adv_freq_dict):
     '''
@@ -287,5 +289,5 @@ def req(main_link, pages):
         for key, value in a_freq_dict_sorted.items():
             writer.writerow([key,value])
 # это моя ссылка поиска и количество страниц выдачи      
-req('http://processing.ruscorpora.ru/search.xml?sort=i_grtagging&out=normal&dpp=100&spd=100&seed=7127&text=lexgramm&mysent=&level1=0&level2=1&level3=1&level4=2&type4=&flags2=&type3=&type2=&flags4=&flags1=&flags3=&mysize=&mysentsize=&simple=1&env=alpha&parent2=1&link4=on&link3=on&link2=on&gramm4=S&gramm1=S&gramm2=S&gramm3=PR&min2=&min3=1&min4=1&lang=ru&lex4=&lex1=&lex3=&max2=&max3=&lex2=&mycorp=&max4=&notag=1&parent4=3&parent3=1&mode=syntax&parent1=0'
+req('http://processing.ruscorpora.ru/search.xml?sort=i_grtagging&out=normal&dpp=100&spd=100&seed=29547&text=lexgramm&mysent=&level1=0&level2=1&level3=2&level4=3&type4=&flags2=&type3=&type2=&flags4=&flags1=&flags3=&mysize=&mysentsize=&simple=1&env=alpha&parent2=1&link4=on&link3=on&link2=on&gramm4=S&gramm1=S&gramm2=S&gramm3=PR&min2=1&min3=1&min4=1&lang=ru&lex4=&lex1=&lex3=&max2=&max3=&lex2=&mycorp=&max4=&notag=1&parent4=3&parent3=2&mode=syntax&parent1=0'
     ,7)
