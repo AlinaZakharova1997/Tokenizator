@@ -14,6 +14,7 @@ import re
 
 
 
+
 class SearchEngine(object):
     """
     class SearchEngine
@@ -129,12 +130,19 @@ class SearchEngine(object):
                 # если функция только модифицирует и ничего не возвращает
                 # вызывай ее вот так и не путай! здесь я расширяю окно до границ предложения
                 window.extend_window()
+                # print(window,'extended')
                
-        i = 0
+        
+        # print('I want to reunite')
         for key, win_array in dictionary.items():
+            # print("I am in for")
+            i = 0
             while i < len(win_array)-1:
+                # print('I am in while')
                 if win_array[i].is_crossed(win_array[i+1]):
+                    print(win_array[i].is_crossed(win_array[i+1]),'is crossed')
                     win_array[i].get_united_window(win_array[i+1])
+                    print('get_united')
                     win_array.remove(win_array[i+1])
                 else:
                     i+=1
@@ -157,7 +165,7 @@ class SearchEngine(object):
         
         output_dict = {} 
         dictionary = self.unite_extended(query, win_size)
-        # print(dictionary,'dictionary')
+        print(dictionary,'dictionary')
         for key, value in dictionary.items():
             # print(value,'value')
             for window in value:
@@ -165,7 +173,7 @@ class SearchEngine(object):
                 # here it can highlight two words
                 # print(string,'string')
                 output_dict.setdefault(key, []).append(string)
-        # print(output_dict,'dict')        
+        print(output_dict,'dict')        
         return output_dict  
 
     def qulim_search(self, query, limit, offset, doc_limof, win_size):
@@ -183,17 +191,19 @@ class SearchEngine(object):
         if not isinstance(query, str) or not isinstance(win_size, int):
             raise TypeError('Input has an unappropriate type!')
         
-        output_dict = {}
+        # dictionary for results
+        output_dict = dict()
         # number of document
         qunum = 0
         dictionary = self.unite_extended(query, win_size)
         print(dictionary, 'dictionary')
+        print(doc_limof,'doc_limof')
         for number, filename in enumerate(sorted(dictionary)):
             if number == limit + offset:
                 break;
             if number >= offset and number < limit + offset:
                 # тут я создаю список для каждого файла
-                output_dict[filename] = []
+                output_dict.setdefault(filename, [])
                 # get all the qoutes in file
                 all_quotes  = dictionary[filename]
                 # limit for document
@@ -204,16 +214,17 @@ class SearchEngine(object):
                     if num == qulim + quset:
                         break;
                     if num >= quset and num < qulim + quset:
+                         print(quset,'quset')
+                         print(qulim + quset,'qulim + quset')
                          output_dict[filename].append(quote.highlight_window())
-                qunum += 1
+                         print("I got a quote!") 
+                         print(quote,'quote!!!')
+                qunum += 1         
         print(output_dict, 'output_dict')        
-        return output_dict   
+        return output_dict 
         
    
        
-
-
-
 
 
 
