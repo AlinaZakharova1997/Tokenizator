@@ -1,5 +1,4 @@
 
-
 """
 Context_Windows
 This module returns context windows for each query word
@@ -12,8 +11,8 @@ import re
 
 
 # make a pattern for re.match()
-PATTERN_RIGHT = re.compile(r'[\.!?]* [A-ZА-Я]') 
-PATTERN_LEFT = re.compile(r'[A-ZА-Я] [\.!?]*')
+PATTERN_RIGHT = re.compile(r'[\.!?] [A-ZА-Яa-zа-я]') 
+PATTERN_LEFT = re.compile(r'[A-ZА-Яa-zа-я] [\.!?]')
 
 class Context_Window(object):
     """
@@ -95,7 +94,9 @@ class Context_Window(object):
         '''
         if not isinstance(window_B, Context_Window):
             raise TypeError('Input has an unappropriate type!')
-        if self.win_start < window_B.win_end and self.win_end > window_B.win_start and self.positions[0].lnumber == window_B.positions[0].lnumber:
+        if self.win_start <= window_B.win_end and self.win_end >= window_B.win_start and self.positions[0].lnumber == window_B.positions[0].lnumber:
+            return True
+        if self.win_start == window_B.win_start and self.win_end == window_B.win_end and self.positions[0].lnumber == window_B.positions[0].lnumber:
             return True
         else:
             return False
@@ -104,14 +105,22 @@ class Context_Window(object):
         
         '''
         This function unites two windows
-        @param window_B: the second window 
+        @param window_B: the second window
+        It changes self so that is has new positions and returns nothing!!
         '''
         
         if not isinstance(window_B, Context_Window):
             raise TypeError('Input has an unappropriate type!')
         
-        self.win_end = window_B.win_end
+        '''for position in window_B.positions:
+            if position not in self.positions:
+                self.positions.append(position)'''
         self.positions.extend(window_B.positions)
+        self.win_start = min(window_B.win_start,self.win_start)
+        self.win_end = max(window_B.win_end,self.win_end)
+       
+        
+        
         
 
     def extend_window(self):
@@ -119,24 +128,19 @@ class Context_Window(object):
         This function extends a given window to sentence
         @return: an extended window
         ''' 
-        to_right = self.string[self.win_end+1:]
-        print(to_right, 'to right')
+        to_right = self.string[self.win_end:]
         to_left = self.string[:self.win_start+1][::-1]
-        print(to_left, 'to left')
         left = PATTERN_LEFT.search(to_left)
         right = PATTERN_RIGHT.search(to_right)
-        if right is not None:
-            self.win_end += right.end()
-            print(right, 'right')
-        else:
-            self.win_end = len(self.string)
-        if left is not None:
-            self.win_start =  self.win_start - left.start()
-            print(left, 'left')
-            print( self.win_start, ' self.win_start')
-        else:
+        if left is None:
             self.win_start = 0
-       
+        else:
+            self.win_start -= left.start()
+        if right is None:
+            self.win_end = len(self.string)
+        else:
+            self.win_end += right.start() + 1
+          
                 
 
     def highlight_window(self):
@@ -156,15 +160,6 @@ class Context_Window(object):
 
 
 if __name__ == '__main__':
-    window_A = Context_Window('string','positions','win_start','win_end')
-    window_B = Context_Window('string','positions','win_start','win_end')
     window_X = window_A.get_window('test.txt', Position_Plus(0, 4, 20), 1)
     window_Y = window_B.get_window('test.txt', Position_Plus(0, 9, 30), 1)
-    print(type(window_X))
-    print(window_X.positions,'positions')
-    print(window_X.win_start, 'start')
-    '''window_X.get_united_window(window_Y)'''
-    window_X.extend_window()
-    print(window_X.positions,'positions')
-    print(window_X.win_start, 'start')
    
