@@ -210,7 +210,7 @@ class TestMyCode(unittest.TestCase):
         with self.assertRaises(TypeError):
             self.search.unite_extended('window)))', s)
 
-    def test_unite_extended(self):
+    def test_unite_extended_all_words(self):
         test_file_one = open('test_unite_extended.txt', 'w') 
         test_file_one.write('Alina Zakharova is a student!!')
         test_file_one.close()
@@ -224,19 +224,32 @@ class TestMyCode(unittest.TestCase):
                                                                                             Position_Plus(0, 21, 28)], 0, 30)]}
         self.assertEqual(result, fine_result)
         os.remove('test_unite_extended.txt')
-   
+        
+    def test_unite_extended(self):
+        test_file_one = open('test_unite_extended.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student!! Smart Student Alina Zakharova tries to write programs.')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_unite_extended.txt')
+        del self.indexator      
+        self.search = SearchEngine('database')
+        query = 'Alina Zakharova'
+        result = self.search.unite_extended(query, 1)
+        fine_result = {'test_unite_extended.txt':[Context_Window('Alina Zakharova is a student!! Smart Student Alina Zakharova tries to write programs.',[Position_Plus(0, 0, 5), Position_Plus(0, 6, 15)], 0, 30),
+                                                  Context_Window('Alina Zakharova is a student!! Smart Student Alina Zakharova tries to write programs.',[Position_Plus(0,45,50),Position_Plus(0,51,60)], 31, 85)]}
+        self.assertEqual(result, fine_result)
+        os.remove('test_unite_extended.txt')    
+  
     def test_query_search(self):
-       # этот тест проходит, значит тут все правильно
-       # и он может подсвечивать два слова из запроса из двух слов
        test_file_one = open('test_query_search.txt', 'w') 
-       test_file_one.write('Alina Zakharova is a student!!')
+       test_file_one.write('Alina Zakharova is a student!! Smart Student Alina Zakharova tries to write programs.')
        test_file_one.close()
        self.indexator.get_index_with_line('test_query_search.txt')
        del self.indexator
        self.search = SearchEngine('database')
        query = 'Alina Zakharova'
        result = self.search.query_search(query, 1)
-       fine_result = {'test_query_search.txt':['<b>Alina</b> <b>Zakharova</b> is a student!!']}
+       fine_result = {'test_query_search.txt':['<b>Alina</b> <b>Zakharova</b> is a student!!',
+                                               'Smart Student <b>Alina</b> <b>Zakharova</b> tries to write programs.']}
        self.assertEqual(result, fine_result)
        os.remove('test_query_search.txt')
 
@@ -278,6 +291,7 @@ class TestMyCode(unittest.TestCase):
        self.assertEqual(result, fine_result)
        os.remove('test_qulim_search_one.txt')
        os.remove('test_qulim_search_two.txt')
+
        
     def test_qulim_search_one(self):
        test_file_one = open('test_qulim_search_one.txt', 'w') 
@@ -328,10 +342,8 @@ class TestMyCode(unittest.TestCase):
        os.remove('test_qulim_search_three.txt')
        
     def test_qulim_search_three(self):
-        # здесь ошибка, подсвечивает только второе слово
-        # делает цитату всегда по одному слову
         test_file_one = open('test_qulim_search_one.txt', 'w') 
-        test_file_one.write('Smart Student Alina Zakharova is a linguist!! We are gonna rock, we are gonna rock around the clock tonight. Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
+        test_file_one.write('Smart Student Alina Zakharova is a linguist!! Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
         test_file_one.close()
         test_file_two = open('test_qulim_search_two.txt', 'w') 
         test_file_two.write('Little funny girl Alina Zakharova loves big apples. Also student Alina Zakharova loves rock music.')
@@ -345,16 +357,16 @@ class TestMyCode(unittest.TestCase):
         del self.indexator
         self.search = SearchEngine('database')
         query = 'Alina Zakharova'
-        result = self.search.qulim_search(query, win_size=1, limit=2, offset=1, doc_limof =[(2,0), (2,0)] )
+        result = self.search.qulim_search(query, win_size=1, limit=2, offset=1, doc_limof =[(2,0), (1,0)] )
         fine_result = {
                       'test_qulim_search_two.txt': ['Little funny girl <b>Alina</b> <b>Zakharova</b> loves big apples.',
                                                     'Also extra smart student <b>Alina</b> <b>Zakharova</b> loves rock music.'],
-                      'test_qulim_search_three.txt':['Beautiful and perfect <b>Alina</b> <b>Zakharova</b> loves sweets and black coffee.',
-                                                     'Also cute and nice <b>Alina</b> <b>Zakharova</b> loves Disney cartoons.']}
+                      'test_qulim_search_three.txt':['Beautiful and perfect <b>Alina</b> <b>Zakharova</b> loves sweets and black coffee.']}
         self.assertEqual(result, fine_result)
         os.remove('test_qulim_search_one.txt')
         os.remove('test_qulim_search_two.txt')
         os.remove('test_qulim_search_three.txt')  
+
 
     def test_qulim_search_empty(self):
         test_file_one = open('test_qulim_search_one.txt', 'w') 
@@ -379,4 +391,5 @@ class TestMyCode(unittest.TestCase):
        
 if __name__ == '__main__':
     unittest.main()        
+
 
