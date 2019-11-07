@@ -145,7 +145,7 @@ class TestMyCode(unittest.TestCase):
         self.search = SearchEngine('database')
         window_A = windows.Context_Window.get_window('test_united_window.txt', Position_Plus(0, 4, 20), 1)
         window_B = windows.Context_Window.get_window('test_united_window.txt', Position_Plus(0, 9, 30), 1)
-        united_AB = window_A.get_united_window(window_B)
+        window_A.get_united_window(window_B)
         self.win = windows.Context_Window('The girl named Alina Zakharova is a student',[Position_Plus(0, 4, 20),Position_Plus(0, 9, 30)],9,20)
         self.assertEqual(window_A.string, self.win.string)
         self.assertEqual(window_A.win_start, self.win.win_start)
@@ -194,7 +194,24 @@ class TestMyCode(unittest.TestCase):
         extended_window = Context_Window('Alina Zakharova is a student!!',[Position_Plus(0, 6, 15)], 0, 30)
         self.assertEqual(window, extended_window)
         os.remove('test_extend_window.txt')
-        
+
+
+    def test_extend_window_two_words(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_extend_window.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student!!')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_extend_window.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        window_one = windows.Context_Window.get_window('test_extend_window.txt', Position_Plus(0, 6, 15), 1)
+        window_two = windows.Context_Window.get_window('test_extend_window.txt', Position_Plus(0, 0, 5), 1)
+        window_one.get_united_window(window_two)
+        window_one.extend_window()
+        extended_window = Context_Window('Alina Zakharova is a student!!',[ Position_Plus(0, 6, 15), Position_Plus(0, 0, 5)], 0, 30)
+        self.assertEqual(window_one, extended_window)
+        os.remove('test_extend_window.txt')    
+    
     def test_extend_window_rus(self):
         self.indexator = Indexer('database')
         test_file_one = open('test_extend_window_rus.txt', 'w') 
@@ -205,9 +222,35 @@ class TestMyCode(unittest.TestCase):
         self.search = SearchEngine('database')
         window = windows.Context_Window.get_window('test_extend_window_rus.txt', Position_Plus(0, 28, 36), 1)
         window.extend_window()
-        extended_window = Context_Window('Прогать очень сложно! Алина Захарова студент лингвист!! Аня любит немецкий. В Петербурге идет дождь.',[Position_Plus(0, 28, 36)], 22, 56)
+        extended_window = Context_Window('Прогать очень сложно! Алина Захарова студент лингвист!! Аня любит немецкий. В Петербурге идет дождь.',[Position_Plus(0, 28, 36)], 22, 55)
         self.assertEqual(window, extended_window)
-
+       
+    def test_extend_window_rus_one(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_extend_window_rus.txt', 'w') 
+        test_file_one.write('Пьер с грустью слышал над собою насмешки.')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_extend_window_rus.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        window = windows.Context_Window.get_window('test_extend_window_rus.txt', Position_Plus(0, 0, 4), 1)
+        window.extend_window()
+        extended_window = Context_Window('Пьер с грустью слышал над собою насмешки.',[Position_Plus(0, 0, 4)], 0, 41 )
+        self.assertEqual(window, extended_window)
+        
+    def test_extend_window_rus_two(self):
+        self.indexator = Indexer('database')
+        test_file_one = open('test_extend_window_rus.txt', 'w') 
+        test_file_one.write('С разных сторон виднелись пожары. Пьер тогда еще не понимал значения сожженной Москвы и с ужасом смотрел на эти пожары.')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_extend_window_rus.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        window = windows.Context_Window.get_window('test_extend_window_rus.txt', Position_Plus(0, 34, 38), 1)
+        window.extend_window()
+        extended_window = Context_Window('С разных сторон виднелись пожары. Пьер тогда еще не понимал значения сожженной Москвы и с ужасом смотрел на эти пожары.',[Position_Plus(0, 34, 38)], 0, 119 )
+        self.assertEqual(window, extended_window)    
+         
     def test_already_extended_window(self):
         self.indexator = Indexer('database')
         test_file_one = open('test_already_extended_window.txt', 'w') 
@@ -232,6 +275,8 @@ class TestMyCode(unittest.TestCase):
         output_string = 'Alina <b>Zakharova</b> is'
         self.assertEqual(result, output_string)
         os.remove('test_highlight_window.txt')
+        
+      
        
   
 
