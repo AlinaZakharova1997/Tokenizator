@@ -315,81 +315,80 @@ class TestMyCode(unittest.TestCase):
 
 
     def test_qulim_search_two(self):
-       test_file_one = open('test_qulim_search_one.txt', 'w') 
+       test_file_one = open('test_qulim_search_1.txt', 'w') 
        test_file_one.write('Smart Student Alina Zakharova is a linguist!! We are gonna rock, we are gonna rock around the clock tonight. Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
        test_file_one.close()
-       test_file_two = open('test_qulim_search_two.txt', 'w') 
+       test_file_two = open('test_qulim_search_2.txt', 'w') 
        test_file_two.write('Little Alina Zakharova loves big apples. Also student Alina Zakharova loves rock music.')
        test_file_two.close()
-       test_file_three = open('test_qulim_search_three.txt', 'w') 
+       test_file_three = open('test_qulim_search_3.txt', 'w') 
        test_file_three.write('Beautiful Alina Zakharova loves sweets and black coffee. Also cute Alina Zakharova loves Disney cartoons.')
        test_file_three.close()
-       self.indexator.get_index_with_line('test_qulim_search_one.txt')
-       self.indexator.get_index_with_line('test_qulim_search_two.txt')
-       self.indexator.get_index_with_line('test_qulim_search_three.txt')
+       self.indexator.get_index_with_line('test_qulim_search_1.txt')
+       self.indexator.get_index_with_line('test_qulim_search_2.txt')
+       self.indexator.get_index_with_line('test_qulim_search_3.txt')
        del self.indexator
        self.search = SearchEngine('database')
        query = 'Zakharova'
        result = self.search.qulim_search(query, win_size=1, limit=2, offset=1, doc_limof =[(2,0), (2,0)] )
        fine_result = {
-                      'test_qulim_search_two.txt': ['Little Alina <b>Zakharova</b> loves big apples.',
+                      'test_qulim_search_2.txt': ['Little Alina <b>Zakharova</b> loves big apples.',
                                                     'Also student Alina <b>Zakharova</b> loves rock music.'],
-                      'test_qulim_search_three.txt':['Beautiful Alina <b>Zakharova</b> loves sweets and black coffee.',
+                      'test_qulim_search_3.txt':['Beautiful Alina <b>Zakharova</b> loves sweets and black coffee.',
                                                      'Also cute Alina <b>Zakharova</b> loves Disney cartoons.']}
        self.assertEqual(result, fine_result)
-       os.remove('test_qulim_search_one.txt')
-       os.remove('test_qulim_search_two.txt')
-       os.remove('test_qulim_search_three.txt')
+       os.remove('test_qulim_search_1.txt')
+       os.remove('test_qulim_search_2.txt')
+       os.remove('test_qulim_search_3.txt')
        
     def test_qulim_search_three(self):
-        test_file_one = open('test_qulim_search_one.txt', 'w') 
+        test_file_one = open('test_qulim_search_1.txt', 'w') 
         test_file_one.write('Smart Student Alina Zakharova is a linguist!! Smart Student Alina Zakharova tries to write programs. Python is easy, Zakharova, keep calm caaalm!!!')
         test_file_one.close()
-        test_file_two = open('test_qulim_search_two.txt', 'w') 
-        test_file_two.write('Little funny girl Alina Zakharova loves big apples. Also student Alina Zakharova loves rock music.')
+        test_file_two = open('test_qulim_search_2.txt', 'w') 
+        test_file_two.write('Little funny girl Alina Zakharova loves big apples. Also extra smart student Alina Zakharova loves rock music.')
         test_file_two.close()
-        test_file_three = open('test_qulim_search_three.txt', 'w') 
+        test_file_three = open('test_qulim_search_3.txt', 'w') 
         test_file_three.write('Beautiful and perfect Alina Zakharova loves sweets and black coffee. Also cute and nice Alina Zakharova loves Disney cartoons.')
         test_file_three.close()
-        self.indexator.get_index_with_line('test_qulim_search_one.txt')
-        self.indexator.get_index_with_line('test_qulim_search_two.txt')
-        self.indexator.get_index_with_line('test_qulim_search_three.txt')
+        self.indexator.get_index_with_line('test_qulim_search_1.txt')
+        self.indexator.get_index_with_line('test_qulim_search_2.txt')
+        self.indexator.get_index_with_line('test_qulim_search_3.txt')
         del self.indexator
+
         self.search = SearchEngine('database')
         query = 'Alina Zakharova'
         result = self.search.qulim_search(query, win_size=1, limit=2, offset=1, doc_limof =[(2,0), (1,0)] )
         fine_result = {
-                      'test_qulim_search_two.txt': ['Little funny girl <b>Alina</b> <b>Zakharova</b> loves big apples.',
+                      'test_qulim_search_2.txt': ['Little funny girl <b>Alina</b> <b>Zakharova</b> loves big apples.',
                                                     'Also extra smart student <b>Alina</b> <b>Zakharova</b> loves rock music.'],
-                      'test_qulim_search_three.txt':['Beautiful and perfect <b>Alina</b> <b>Zakharova</b> loves sweets and black coffee.']}
+                      'test_qulim_search_3.txt':['Beautiful and perfect <b>Alina</b> <b>Zakharova</b> loves sweets and black coffee.']}
         self.assertEqual(result, fine_result)
-        os.remove('test_qulim_search_one.txt')
-        os.remove('test_qulim_search_two.txt')
-        os.remove('test_qulim_search_three.txt')  
+        os.remove('test_qulim_search_1.txt')
+        os.remove('test_qulim_search_2.txt')
+        os.remove('test_qulim_search_3.txt')  
 
 
     def test_qulim_search_empty(self):
-        test_file_one = open('test_qulim_search_one.txt', 'w') 
+        test_file_one = open('test_qulim_search_1.txt', 'w') 
         test_file_one.write('Alina Zakharova is a student!! Zakharova tries to write programs. Python is easy, Zakharova, keep calm!!!')
         test_file_one.close()
-        test_file_two = open('test_qulim_search_two.txt', 'w') 
+        test_file_two = open('test_qulim_search_2.txt', 'w') 
         test_file_two.write('Little Zakharova loves big apples. Also Zakharova loves rock music.')
         test_file_two.close()
-        self.indexator.get_index_with_line('test_qulim_search_one.txt')
-        self.indexator.get_index_with_line('test_qulim_search_two.txt')
+        self.indexator.get_index_with_line('test_qulim_search_1.txt')
+        self.indexator.get_index_with_line('test_qulim_search_2.txt')
         del self.indexator
         self.search = SearchEngine('database')
         query = 'Scorpions'
         result = self.search.qulim_search(query, win_size=1, limit=2, offset=0, doc_limof =[(3,0), (3,0)] )
         fine_result = {}
         self.assertEqual(result, fine_result)
-        os.remove('test_qulim_search_one.txt')
-        os.remove('test_qulim_search_two.txt')
+        os.remove('test_qulim_search_1.txt')
+        os.remove('test_qulim_search_2.txt')
         
 
                     
        
 if __name__ == '__main__':
     unittest.main()        
-
-
