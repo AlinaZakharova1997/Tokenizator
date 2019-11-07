@@ -71,6 +71,8 @@ class SearchEngine(object):
         for filename in files:
             for token in self.tokenizator.token_gen(tok_str):
                output_dict.setdefault(filename,[]).extend(self.database[token.s][filename])
+            # sort positions
+            output_dict[filename].sort()
         return output_dict
             
     def unite_all(self,dictionary,win_size):
@@ -95,6 +97,7 @@ class SearchEngine(object):
                window = Context_Window.get_window(key, pos, win_size)
                win_array.append(window) 
        i = 0
+       # тут окна объединяются
        for key, win_array in output_dict.items():
            while i < len(win_array)-1:
                if win_array[i].is_crossed(win_array[i+1]):
@@ -102,7 +105,7 @@ class SearchEngine(object):
                    win_array.remove(win_array[i+1])
                else:
                    i+=1
-
+      
        return output_dict
     
     def unite_extended(self, query, win_size):
@@ -123,7 +126,10 @@ class SearchEngine(object):
         dictionary = self.unite_all(to_dict, win_size)
         for value in dictionary.values():
             for window in value:
-                window = Context_Window.extend_window(window)       
+                # если функция только модифицирует и ничего не возвращает
+                # вызывай ее вот так и не путай! здесь я расширяю окно до границ предложения
+                window.extend_window()
+               
         i = 0
         for key, win_array in dictionary.items():
             while i < len(win_array)-1:
@@ -132,10 +138,13 @@ class SearchEngine(object):
                     win_array.remove(win_array[i+1])
                 else:
                     i+=1
-         
-        return dictionary 
+        
+        return dictionary
+        
+        
+
     
-    def query_search(self, query, win_size = 3):
+    def query_search(self, query, win_size):
         '''
         This function performs searching a query in database and returs
         a dictionary filemname:query in string format
@@ -148,13 +157,18 @@ class SearchEngine(object):
         
         output_dict = {} 
         dictionary = self.unite_extended(query, win_size)
+        # print(dictionary,'dictionary')
         for key, value in dictionary.items():
+            # print(value,'value')
             for window in value:
                 string = window.highlight_window()
+                # here it can highlight two words
+                # print(string,'string')
                 output_dict.setdefault(key, []).append(string)
+        # print(output_dict,'dict')        
         return output_dict  
 
-    def qulim_search(self, query, limit, offset, doc_limof, win_size = 3):
+    def qulim_search(self, query, limit, offset, doc_limof, win_size):
         '''
         This function performs searching a query in database and returs
         a dictionary filemname:query in string format
@@ -173,6 +187,7 @@ class SearchEngine(object):
         # number of document
         qunum = 0
         dictionary = self.unite_extended(query, win_size)
+        print(dictionary, 'dictionary')
         for number, filename in enumerate(sorted(dictionary)):
             if number == limit + offset:
                 break;
@@ -189,9 +204,22 @@ class SearchEngine(object):
                     if num == qulim + quset:
                         break;
                     if num >= quset and num < qulim + quset:
-                         print(quote,'quote')
-                         print(quote.highlight_window(),'highlight')
                          output_dict[filename].append(quote.highlight_window())
-                qunum += 1          
-        return output_dict  
+                qunum += 1
+        print(output_dict, 'output_dict')        
+        return output_dict   
         
+   
+       
+
+
+
+
+
+
+
+
+
+
+
+
