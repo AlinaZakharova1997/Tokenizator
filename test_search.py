@@ -368,6 +368,32 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_qulim_search_2.txt')
         os.remove('test_qulim_search_3.txt')  
 
+     def test_qulim_search_four(self):
+        test_file_one = open('test_qulim_search_1.txt', 'w') 
+        test_file_one.write('Умная ученица Алина Захарова - лингвист !! Умная ученица Алина Захарова пытается писать программы. Питон - это просто, Захарова, сохраняй спокойствие!')
+        test_file_one.close()
+        test_file_two = open('test_qulim_search_2.txt', 'w') 
+        test_file_two.write('Маленькая смешная девочка Алина Захарова любит большие яблоки. Также очень умная ученица Алина Захарова любит рок-музыку.')
+        test_file_two.close()
+        test_file_three = open('test_qulim_search_3.txt', 'w') 
+        test_file_three.write('Прекрасная и идеальная Алина Захарова любит сладости и черный кофе. Также милая и милая Алина Захарова любит мультфильмы Диснея.')
+        test_file_three.close()
+        self.indexator.get_index_with_line('test_qulim_search_1.txt')
+        self.indexator.get_index_with_line('test_qulim_search_2.txt')
+        self.indexator.get_index_with_line('test_qulim_search_3.txt')
+        del self.indexator
+
+        self.search = SearchEngine('database')
+        query = 'Алина Захарова'
+        result = self.search.qulim_search(query, win_size=1, limit=2, offset=1, doc_limof =[(2,0), (1,0)] )
+        fine_result = {
+                      'test_qulim_search_2.txt': ['Маленькая смешная девочка <b>Алина</b> <b>Захарова</b> любит большие яблоки.',
+                                                    'Также очень умная ученица <b>Алина</b> <b>Захарова</b> любит рок-музыку.'],
+                      'test_qulim_search_3.txt':['Прекрасная и идеальная <b>Алина</b> <b>Захарова</b> любит сладости и черный кофе.']}
+        self.assertEqual(result, fine_result)
+        os.remove('test_qulim_search_1.txt')
+        os.remove('test_qulim_search_2.txt')
+        os.remove('test_qulim_search_3.txt')  
 
     def test_qulim_search_empty(self):
         test_file_one = open('test_qulim_search_1.txt', 'w') 
