@@ -53,11 +53,19 @@ class Position_Plus(Position):
         return self.lnumber == position.lnumber and self.start == position.start and self.end == position.end 
 
     def __lt__(self, other_pos):
-        
-        if self.lnumber < other_pos.lnumber or self.lnumber > other_pos.lnumber :
-            return self.lnumber < other_pos.lnumber or self.lnumber > other_pos.lnumber 
-        else:
-            return self.start < other_pos.start
+        '''
+        This function compares two positions, i.e. their parameters
+        and returns the result of this comparison
+        @param other_pos: position that is to be compared with self
+        @return: comparison_result, i.e. True or False
+        '''
+        comparison_result = False
+        if self.lnumber < other_pos.lnumber:
+            comparison_result = True
+        if self.lnumber == other_pos.lnumber:
+            if self.start < other_pos.start:
+                comparison_result = True
+        return comparison_result
 
     def __repr__(self):
 
