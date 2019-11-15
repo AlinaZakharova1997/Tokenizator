@@ -29,7 +29,19 @@ class TestMyCode(unittest.TestCase):
     def test_if_file_exists(self):
         with self.assertRaises(FileNotFoundError):
             self.indexator.get_index('None.txt')
-          
+            
+    def test__lt__same_line(self):
+        pos = Position_Plus(0, 2, 4)
+        other_pos = Position_Plus(0, 0, 1)
+        result = other_pos.__lt__(pos)
+        self.assertEqual(result, True)
+        
+    def test_lt_diff_lines(self):
+        pos = Position_Plus(1, 2, 4)
+        other_pos = Position_Plus(0, 0, 1)
+        result = other_pos.__lt__(pos)
+        self.assertEqual(result, True)
+        
     def test_database_one_token(self):
         test_file = open('testfile.txt', 'w') 
         test_file.write('Alina')
@@ -84,17 +96,17 @@ class TestMyCode(unittest.TestCase):
                                                                           
     def test_lines(self):
         file_line = open ('testfile_line.txt','w')
-        file_line.write(' Ф 12 !!! @ # Alina is a student))) \n Alina likes apples 1997\n\n')
+        file_line.write('Ф 12 !!! @ # Alina is a student))) \n Alina likes apples 1997\n\n')
         file_line.close()
         self.indexator.get_index_with_line('testfile_line.txt')
         del self.indexator                                                                 
         base_dict = dict(shelve.open('database'))
-        cool_result = {'Ф': {'testfile_line.txt': [Position_Plus(0, 1, 2)]},
-                       '12': {'testfile_line.txt': [Position_Plus(0, 3, 5)]},
-                       'Alina': {'testfile_line.txt': [Position_Plus(0, 14, 19),Position_Plus(1, 1, 6)]},
-                       'is': {'testfile_line.txt': [Position_Plus(0, 20, 22)]},
-                       'a': {'testfile_line.txt': [Position_Plus(0, 23, 24)]},
-                       'student': {'testfile_line.txt': [Position_Plus(0, 25, 32)]},
+        cool_result = {'Ф': {'testfile_line.txt': [Position_Plus(0, 0, 1)]},
+                       '12': {'testfile_line.txt': [Position_Plus(0, 2, 4)]},
+                       'Alina': {'testfile_line.txt': [Position_Plus(0, 13, 18),Position_Plus(1, 1, 6)]},
+                       'is': {'testfile_line.txt': [Position_Plus(0, 19, 21)]},
+                       'a': {'testfile_line.txt': [Position_Plus(0, 22, 23)]},
+                       'student': {'testfile_line.txt': [Position_Plus(0, 24, 31)]},
                        'likes' : {'testfile_line.txt': [Position_Plus(1, 7, 12)]},
                        'apples': {'testfile_line.txt': [Position_Plus(1, 13, 19)]},
                        '1997': {'testfile_line.txt': [Position_Plus(1, 20, 24)]}
