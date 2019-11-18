@@ -43,6 +43,7 @@ def lemma_generator(lists):
     firsts = [next(it) for it in iters]
     # нахожу лемму с максимальным значением частоты
     lemma_iter = max(firsts, key=lambda lemma, freq: freq)
+    # <lambda>() missing 1 required positional argument: 'freq'
     yield (lemma_iter)
     print(lemma_iter,'lemma_iter')
     lemma_iter.pos = firsts.index(lemma_iter)
