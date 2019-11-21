@@ -30,17 +30,29 @@ class TestMyCode(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             self.indexator.get_index('None.txt')
             
-    def test__lt__same_line(self):
+    def test__lt__same_line_one(self):
         pos = Position_Plus(0, 2, 4)
         other_pos = Position_Plus(0, 0, 1)
         result = other_pos.__lt__(pos)
         self.assertEqual(result, True)
         
-    def test_lt_diff_lines(self):
+    def test__lt__same_line_two(self):
+        pos = Position_Plus(0, 0, 4)
+        other_pos = Position_Plus(0, 5, 8)
+        result = other_pos.__lt__(pos)
+        self.assertEqual(result, False)    
+        
+    def test_lt_diff_lines_one(self):
         pos = Position_Plus(1, 2, 4)
         other_pos = Position_Plus(0, 0, 1)
         result = other_pos.__lt__(pos)
         self.assertEqual(result, True)
+        
+    def test_lt_diff_lines_two(self):
+        pos = Position_Plus(1, 2, 4)
+        other_pos = Position_Plus(2, 0, 1)
+        result = other_pos.__lt__(pos)
+        self.assertEqual(result, False)    
         
     def test_database_one_token(self):
         test_file = open('testfile.txt', 'w') 
@@ -124,4 +136,6 @@ class TestMyCode(unittest.TestCase):
 if __name__ == '__main__':
     unittest.main() 
        
+
+
 
