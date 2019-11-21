@@ -57,15 +57,16 @@ class Position_Plus(Position):
         This function compares two positions, i.e. their parameters
         and returns the result of this comparison
         @param other_pos: position that is to be compared with self
-        @return: comparison_result, i.e. True or False
+        @return: comparison_result, i.e. True or False if one position less than another
         '''
-        comparison_result = False
+        '''comparison_result = False
         if self.lnumber < other_pos.lnumber:
             comparison_result = True
         if self.lnumber == other_pos.lnumber:
             if self.start < other_pos.start:
                 comparison_result = True
-        return comparison_result
+        return comparison_result'''
+        return((self.lnumber < other_pos.lnumber) or ((self.lnumber == other_pos.lnumber) and(self.start < other_pos.start)))
 
     def __repr__(self):
 
