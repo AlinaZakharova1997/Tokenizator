@@ -10,7 +10,7 @@ class TestMyCode(unittest.TestCase):
                  [('с', 10,'prep'),('в', 56,'prep')]]
         
         result = list(make_selection.lemma_generator(lists))
-        cool = [('в','prep'),('быть','verb'),('девочка','noun'),('собака','noun'),('бегать','verb'),('кот','noun'),('с','prep'),('дискутировать','verb'),('булдыжничать', 1,'verb')]
+        cool = [('в','prep'),('быть','verb'),('девочка','noun'),('собака','noun'),('бегать','verb'),('кот','noun'),('с','prep'),('дискутировать','verb'),('булдыжничать','verb')]
         self.assertEqual(result, cool)
 
 
