@@ -83,9 +83,8 @@ class SearchEngine(object):
        @param win_size: a size of a context window
        @return: a dictionary filename:Context Windows
        '''
-       if not isinstance(dictionary, dict) or not isinstance(win_size, int):
-            raise TypeError('Input has an unappropriate type!')
-      
+       if not isinstance(dictionary, dict):
+            raise TypeError('Input has an unappropriate type!')      
        output_dict = {}
        
        # value is an array of positions
@@ -93,10 +92,22 @@ class SearchEngine(object):
            # создаем список каждый раз, чтобы у каждого окна был свой список позиций  
            win_array = output_dict.setdefault(key, [])
            pos_array = value
+           print(pos_array,'pos_array')
            # for each position in values get window()
-           for pos in pos_array:
+           for num, pos in enumerate(pos_array):
+               print(pos,'pos')
+               # когда мы проходим по массиву и сравниваем элемент с предыдущим надо помнить, что мы начинаем с 0 элемента и если мы сравниваем его с -1,
+               # то мы сравниваем с тем элементом, который в самом конце, а это нам не надо; еще может статься, что элемент будет сравниваться сам с собой, если он там один
+               # то он будет удален так, как если бы он был дубликатом(по факту он дублирует сам себя) и по итогу имеем пустой массив и все плохо!!! вот так)))
+               # поэтому проверяем if num > 0
+               if num>0 and pos_array[num] == pos_array[num-1]:
+                   print('positions are equal!!!')
+                   continue
+               print('positions are not equal!!')
                window = Context_Window.get_window(key, pos, win_size)
-               win_array.append(window) 
+               win_array.append(window)
+               print(window,'window!!!')
+               
        i = 0
        # тут окна объединяются
        for key, win_array in output_dict.items():
@@ -121,18 +132,19 @@ class SearchEngine(object):
         '''
         
         if not isinstance(query, str) or not isinstance(win_size, int):
-            raise TypeError('Input has an unappropriate type!')
+            raise TypeError('Input has an unappropriate type! %s, %s' % (query, win_size))
         
         to_dict = self.get_dict_many_tokens(query)
+        print(to_dict,'to_dict')
         dictionary = self.unite_all(to_dict, win_size)
+        print(dictionary,'dictionary')
         for value in dictionary.values():
+            print(value,'value')
             for window in value:
                 # если функция только модифицирует и ничего не возвращает
                 # вызывай ее вот так и не путай! здесь я расширяю окно до границ предложения
                 window.extend_window()
-                # print(window,'extended')
-               
-        
+                print(window,'extended window!!!')
         # print('I want to reunite')
         for key, win_array in dictionary.items():
             # print("I am in for")
@@ -140,9 +152,9 @@ class SearchEngine(object):
             while i < len(win_array)-1:
                 # print('I am in while')
                 if win_array[i].is_crossed(win_array[i+1]):
-                    print(win_array[i].is_crossed(win_array[i+1]),'is crossed')
+                    #print(win_array[i].is_crossed(win_array[i+1]),'is crossed')
                     win_array[i].get_united_window(win_array[i+1])
-                    print('get_united')
+                    #print('get_united')
                     win_array.remove(win_array[i+1])
                 else:
                     i+=1
@@ -161,22 +173,21 @@ class SearchEngine(object):
         @return: dictionary {filename: [query(str)]}
         '''
         if not isinstance(query, str) or not isinstance(win_size, int):
-            raise TypeError('Input has an unappropriate type!')
+            raise TypeError('Input has an unappropriate type! %s, %s' % (query, win_size))
         
         output_dict = {} 
-        dictionary = self.unite_extended(query, win_size)
+        dictionary = self.unite_extended(query, win_size=1)
         print(dictionary,'dictionary')
         for key, value in dictionary.items():
-            # print(value,'value')
+            print(value,'value')
             for window in value:
                 string = window.highlight_window()
-                # here it can highlight two words
-                # print(string,'string')
+                print(string,'string')
                 output_dict.setdefault(key, []).append(string)
         print(output_dict,'dict')        
         return output_dict  
 
-    def qulim_search(self, query, limit, offset, doc_limof, win_size):
+    def qulim_search(self, query, win_size, limit, offset, doc_limof):
         '''
         This function performs searching a query in database and returs
         a dictionary filemname:query in string format
@@ -188,48 +199,53 @@ class SearchEngine(object):
         no more quotes can be shown than this doclimit
         @return: dictionary {filename: [query(str)]}
         '''
-        if not isinstance(query, str) or not isinstance(win_size, int):
-            raise TypeError('Input has an unappropriate type!')
+      
+        if not isinstance(query, str) or not isinstance(limit, int) or not isinstance(offset, int):
+            raise TypeError('Input has an unappropriate type! %s, %s, %s' % (query, limit, offset))
         
         # dictionary for results
         output_dict = dict()
         # number of document
         qunum = 0
         dictionary = self.unite_extended(query, win_size)
-        print(dictionary, 'dictionary')
-        print(doc_limof,'doc_limof')
+        # print(dictionary, 'dictionary')
+        # print(doc_limof,'doc_limof')
         for number, filename in enumerate(sorted(dictionary)):
+            #print('I am in for circle!')
+            #print(filename,'filename')
+            #print(number,'number')
             if number == limit + offset:
                 break;
             if number >= offset and number < limit + offset:
+                #print(number,'number again!!!')
                 # тут я создаю список для каждого файла
                 output_dict.setdefault(filename, [])
                 # get all the qoutes in file
                 all_quotes  = dictionary[filename]
+                print(all_quotes,'all_quotes')
                 # limit for document
                 qulim = doc_limof[qunum][0]
+                #print(qulim, 'qulim')
                 # offset for document
                 quset = doc_limof[qunum][1]
+                #print(quset,'quset')
                 for num, quote in enumerate (all_quotes):
+                    #print('I am in the second for circle!!!')
+                    #print(num,'num!!!')
                     if num == qulim + quset:
                         break;
                     if num >= quset and num < qulim + quset:
-                         print(quset,'quset')
-                         print(qulim + quset,'qulim + quset')
+                         #print(quset,'quset')
+                         #print(qulim + quset,'qulim + quset')
                          output_dict[filename].append(quote.highlight_window())
-                         print("I got a quote!") 
-                         print(quote,'quote!!!')
+                         #print("I got a quote!") 
+                         # print(quote,'quote!!!')
                 qunum += 1         
-        print(output_dict, 'output_dict')        
+        # print(output_dict, 'output_dict')        
         return output_dict 
         
    
        
-
-
-
-
-
 
 
 
