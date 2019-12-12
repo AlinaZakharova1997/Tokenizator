@@ -70,7 +70,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     <body>
                         <form method="post">
                             <input type="text" name="query" value="%s"/>
-                            <input type="submit" value="Search"/>
+                            <input type="submit" name="search"  value="Search"/>
                             <input type="submit" name="action"  value="to the beginning"/>
                             <input type="submit" name="action"  value="back"/>
                             <input type="submit" name="action"  value="forward"/>
@@ -148,3 +148,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
