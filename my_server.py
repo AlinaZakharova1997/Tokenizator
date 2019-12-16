@@ -119,7 +119,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         # здесь лимит по цитатам + 1
         final = my_search.qulim_search(query, 1, limit+1, offset, doc_limof)
         # условия горения кнопок по документам
-        print(offset, 'offset')
+        '''print(offset, 'offset')
         if offset == 0:
             self.wfile.write(bytes(""" <input type="submit" name="action"  value="to the beginning" disabled/>
                                        <input type="submit" name="action"  value="back"disabled/>""", encoding="UTF-8"))
@@ -130,17 +130,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         if len(final) < limit+1:
             self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward" disabled/>""", encoding="UTF-8"))
         else:
-            self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"/>""", encoding="UTF-8"))
+            self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"/>""", encoding="UTF-8"))'''
             
         # the beginning of ordered list
         self.wfile.write(bytes('<ol>', encoding="utf-8")) 
         if not final:
             self.wfile.write(bytes('NOT FOUND, SORRY', encoding="utf-8"))
         # делаю срез, чтобы взять лимит минус 1 результатов, лимит+1 результат не надо показывать, он в уме
-        # нет, не делаю, он не получился, проверяю с помощью друга-ifа и если что, делаю брейк
-        for number,filename in enumerate(sorted(final)):
-            if number > limit-1:
-                break
+        for number,filename in enumerate(sorted(final)[:-1]):
             # create limit and offset for each document for it to have it's personal ones
             quote_lim = doc_limof[number][0]
             quote_offset = doc_limof[number][1]
@@ -161,19 +158,16 @@ class RequestHandler(BaseHTTPRequestHandler):
                 self.wfile.write(bytes(""" <input type="submit" name="action"  value="to the beginning"/>
                                        <input type="submit" name="action"  value="back"/>""", encoding="UTF-8"))
             print(len(final[filename]),'len(final[filename])')
-            print(quote_lim, 'quote_lim + 1')
-            if len(final[filename]) < quote_lim+1:
+            print(quote_lim, 'quote_lim')
+            if len(final[filename]) < quote_lim:
                 self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"disabled/>""", encoding="UTF-8"))
             else:
                 self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"/>""", encoding="UTF-8"))    
             # the beginning of unordered list
             self.wfile.write(bytes('<ul>', encoding="utf-8"))
             # вывожу цитаты до лимита по цитатам - 1
-            for num, quote in enumerate (final[filename]):   
-                if num < quote_lim - 1:
-                    self.wfile.write(bytes('<li><p>%s</p></li>' % quote, encoding="utf-8"))
-                else:
-                    break
+            for num, quote in enumerate (final[filename][:-1]):
+                self.wfile.write(bytes('<li><p>%s</p></li>' % quote, encoding="utf-8"))
             self.wfile.write(bytes('</ul>', encoding="utf-8"))
         self.wfile.write(bytes("""</ol</form></body></html>""", encoding="utf-8"))
         print('time:', time.time() - start_time)
