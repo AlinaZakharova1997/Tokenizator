@@ -75,6 +75,49 @@ class SearchEngine(object):
             # sort positions
             output_dict[filename].sort()
         return output_dict
+    
+    def get_dict_many_tokens_limit_offset(self,tok_str, limit=3, offset=0):
+        """
+        This function performs searching for positions of given tokens
+        @param tok_str: str containing tokens
+        @param limit: number of files to be returned
+        @param offset: from which file to start
+        @return: dictionary, where a key is a filename
+        and a value is a list of positions of all tokens     
+        """
+
+        if not isinstance(tok_str, str):
+            raise TypeError('Input has an unappropriate type!')
+        
+        if not isinstance(limit, int) or not isinstance (offset, int):
+            raise TypeError('Input has an unappropriate type!')
+        
+        if not tok_str:
+            return {}
+        
+        # в случае, если оффсет отрицательный
+        if offset < 0:
+            offset = 0
+            
+        big_dict_files = []
+        for token in self.tokenizator.token_gen(tok_str):
+            big_dict_files.append(self.get_dict(token.s))#выделяем токены и зап-ем в список
+            
+        files = set(big_dict_files[0])    
+        for file_dict in big_dict_files[1:]:
+            files = files.intersection(set(file_dict)) #пересечение названия файлов
+            
+        # сортирую и отсекаю результаты по лимиту и оффсету    
+        resulted_files = sorted(files)[offset: limit+offset]
+        # создаю результурующий словарь
+        output_dict = {}
+        # записываю в него нужные результаты
+        for filename in resulted_files:
+            for token in self.tokenizator.token_gen(tok_str):
+               output_dict.setdefault(filename,[]).extend(self.database[token.s][filename])
+            # sort positions
+            output_dict[filename].sort()
+        return output_dict
             
     def unite_all(self,dictionary,win_size):
        '''
@@ -92,21 +135,21 @@ class SearchEngine(object):
            # создаем список каждый раз, чтобы у каждого окна был свой список позиций  
            win_array = output_dict.setdefault(key, [])
            pos_array = value
-           print(pos_array,'pos_array')
+           # print(pos_array,'pos_array')
            # for each position in values get window()
            for num, pos in enumerate(pos_array):
-               print(pos,'pos')
+               # print(pos,'pos')
                # когда мы проходим по массиву и сравниваем элемент с предыдущим надо помнить, что мы начинаем с 0 элемента и если мы сравниваем его с -1,
                # то мы сравниваем с тем элементом, который в самом конце, а это нам не надо; еще может статься, что элемент будет сравниваться сам с собой, если он там один
                # то он будет удален так, как если бы он был дубликатом(по факту он дублирует сам себя) и по итогу имеем пустой массив и все плохо!!! вот так)))
                # поэтому проверяем if num > 0
                if num>0 and pos_array[num] == pos_array[num-1]:
-                   print('positions are equal!!!')
+                   # print('positions are equal!!!')
                    continue
-               print('positions are not equal!!')
+               # print('positions are not equal!!')
                window = Context_Window.get_window(key, pos, win_size)
                win_array.append(window)
-               print(window,'window!!!')
+               # print(window,'window!!!')
                
        i = 0
        # тут окна объединяются
@@ -135,16 +178,16 @@ class SearchEngine(object):
             raise TypeError('Input has an unappropriate type! %s, %s' % (query, win_size))
         
         to_dict = self.get_dict_many_tokens(query)
-        print(to_dict,'to_dict')
+        # print(to_dict,'to_dict')
         dictionary = self.unite_all(to_dict, win_size)
-        print(dictionary,'dictionary')
+        # print(dictionary,'dictionary')
         for value in dictionary.values():
-            print(value,'value')
+            # print(value,'value')
             for window in value:
                 # если функция только модифицирует и ничего не возвращает
                 # вызывай ее вот так и не путай! здесь я расширяю окно до границ предложения
                 window.extend_window()
-                print(window,'extended window!!!')
+                # print(window,'extended window!!!')
         # print('I want to reunite')
         for key, win_array in dictionary.items():
             # print("I am in for")
@@ -177,14 +220,14 @@ class SearchEngine(object):
         
         output_dict = {} 
         dictionary = self.unite_extended(query, win_size=1)
-        print(dictionary,'dictionary')
+        # print(dictionary,'dictionary')
         for key, value in dictionary.items():
-            print(value,'value')
+            # print(value,'value')
             for window in value:
                 string = window.highlight_window()
-                print(string,'string')
+                # print(string,'string')
                 output_dict.setdefault(key, []).append(string)
-        print(output_dict,'dict')        
+        # print(output_dict,'dict')        
         return output_dict  
 
     def qulim_search(self, query, win_size, limit, offset, doc_limof):
@@ -222,10 +265,10 @@ class SearchEngine(object):
                 output_dict.setdefault(filename, [])
                 # get all the qoutes in file
                 all_quotes  = dictionary[filename]
-                print(all_quotes,'all_quotes')
+                # print(all_quotes,'all_quotes')
                 # limit for document
                 qulim = doc_limof[qunum][0]
-                #print(qulim, 'qulim')
+                # print(qulim, 'qulim')
                 # offset for document
                 quset = doc_limof[qunum][1]
                 #print(quset,'quset')
@@ -246,6 +289,8 @@ class SearchEngine(object):
         
    
        
+
+
 
 
 
