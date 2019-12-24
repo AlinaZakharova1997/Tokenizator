@@ -76,33 +76,36 @@ class RequestHandler(BaseHTTPRequestHandler):
                             </label>
                             <input type="hidden" name="offset" placeholder="offset"value="%d"/>
                 """ % (query, limit, offset), encoding="utf-8"))
-        
-        # I start seraching doclim and docset circle from zero
-        num = 0
         # my list of (doclim,docset) pairs
         docs_list = []
-        while num < limit:
+        for num in range(limit+1):
+            print('I am reading offsets and limits for quotes')
             quote_act = form.getvalue("action%d" % num)
             doclim = form.getvalue('doc%dlim' % num)
-            # print(doclim, 'doclim')
+            print(doclim, 'doclim')
             docset = form.getvalue('doc%dset' % num)
-            # print(docset,'docset')
-            if not doclim:
+            print(docset,'docset')
+            if not doclim  or doclim == "None":
                 doclim = 3
             else:
                 doclim = int(doclim)
-            if not docset:
+            if not docset or docset == "None":
                 docset = 0
             else:
                 docset = int(docset)
             if docset < 0:
                 docset = 0
+            print('I am reading conditions for quote buttons')    
             if quote_act == "back" and docset != 0:
                 docset = docset - doclim
+                print(docset, 'docset for back')
             elif quote_act == "forward":
                 docset = docset + doclim
+                print(docset, 'docset for forward')
             elif quote_act == "to the beginning":
                 docset = 0
+            print(docset,'docset as it is')
+            print(doclim, 'doclim as it is')
             # я добавляю к лимиту единицу, это чтобы листать цитаты
             # (если есть еще одна после лимита, то можно листать, иначе - кнопка не горит!!! и врут календари)))    
             docs_list.append((doclim+1,docset))   
@@ -117,9 +120,9 @@ class RequestHandler(BaseHTTPRequestHandler):
         doc_limof.append((3,0))    
         print(doc_limof,'doc_limof')
         # здесь лимит по цитатам + 1
-        final = my_search.qulim_search(query, 1, limit+1, offset, doc_limof)
+        final = my_search.qulim_search_modified(query, win_size=1, limit+1, offset, doc_limof)
         # условия горения кнопок по документам
-        '''print(offset, 'offset')
+        print(offset, 'offset')
         if offset == 0:
             self.wfile.write(bytes(""" <input type="submit" name="action"  value="to the beginning" disabled/>
                                        <input type="submit" name="action"  value="back"disabled/>""", encoding="UTF-8"))
@@ -127,17 +130,16 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(bytes(""" <input type="submit" name="action"  value="to the beginning"/>
                                        <input type="submit" name="action"  value="back"/>""", encoding="UTF-8"))
         print(len(final), 'len of final')    
-        if len(final) < limit+1:
+        if len(final.keys()) < limit +1:
             self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward" disabled/>""", encoding="UTF-8"))
         else:
-            self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"/>""", encoding="UTF-8"))'''
-            
+            self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"/>""", encoding="UTF-8"))
         # the beginning of ordered list
         self.wfile.write(bytes('<ol>', encoding="utf-8")) 
         if not final:
             self.wfile.write(bytes('NOT FOUND, SORRY', encoding="utf-8"))
         # делаю срез, чтобы взять лимит минус 1 результатов, лимит+1 результат не надо показывать, он в уме
-        for number,filename in enumerate(sorted(final)[:-1]):
+        for number,filename in enumerate(sorted(final)[:limit]):
             # create limit and offset for each document for it to have it's personal ones
             quote_lim = doc_limof[number][0]
             quote_offset = doc_limof[number][1]
@@ -159,9 +161,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                                        <input type="submit" name="action"  value="back"/>""", encoding="UTF-8"))
             print(len(final[filename]),'len(final[filename])')
             print(quote_lim, 'quote_lim')
+            # quote_lim на самом деле уже содержит +1, поэтому еще раз прибавлять не надо
             if len(final[filename]) < quote_lim:
                 self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"disabled/>""", encoding="UTF-8"))
-            else:
+            elif len(final[filename]) >= quote_lim:
                 self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"/>""", encoding="UTF-8"))    
             # the beginning of unordered list
             self.wfile.write(bytes('<ul>', encoding="utf-8"))
@@ -177,4 +180,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
