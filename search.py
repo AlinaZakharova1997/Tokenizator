@@ -206,7 +206,54 @@ class SearchEngine(object):
         
         
 
-    
+    def unite_extended_limit_offset(self, query, win_size, limit=3, offset=0):
+        '''
+        This function unites extended windows in a dictionary(this dictionary
+        contains only limited number of documents starting from offset)
+        It takes query and win_size, makes a dictionary from query,
+        than makes a new one but with windows as values,
+        extends these windows and finally unites them once again
+        @param query: string query
+        @param win_size: size of a window
+        @param limit: number of documents to return
+        @param offset: from which document to start
+        @return: dictionary with extended and reunated windows
+        '''
+        
+        if not isinstance(query, str) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type! %s, %s' % (query, win_size))
+        if not isinstance(limit, int) or not isinstance (offset, int):
+            raise TypeError('Input has an unappropriate type!')
+        
+        # теперь я использую новую функцию поиска по нескольким токенам,
+        # которая учитывает лимит и оффсет
+        to_dict = self.get_dict_many_tokens_limit_offset(query,limit,offset)
+        # print(to_dict,'to_dict')
+        dictionary = self.unite_all(to_dict, win_size)
+        # print(dictionary,'dictionary')
+        for value in dictionary.values():
+            # print(value,'value')
+            for window in value:
+                # если функция только модифицирует и ничего не возвращает
+                # вызывай ее вот так и не путай! здесь я расширяю окно до границ предложения
+                window.extend_window()
+                # print(window,'extended window!!!')
+        # print('I want to reunite')
+        for key, win_array in dictionary.items():
+            # print("I am in for")
+            i = 0
+            while i < len(win_array)-1:
+                # print('I am in while')
+                if win_array[i].is_crossed(win_array[i+1]):
+                    #print(win_array[i].is_crossed(win_array[i+1]),'is crossed')
+                    win_array[i].get_united_window(win_array[i+1])
+                    #print('get_united')
+                    win_array.remove(win_array[i+1])
+                else:
+                    i+=1
+        
+        return dictionary
+        
     def query_search(self, query, win_size):
         '''
         This function performs searching a query in database and returs
@@ -228,8 +275,35 @@ class SearchEngine(object):
                 # print(string,'string')
                 output_dict.setdefault(key, []).append(string)
         # print(output_dict,'dict')        
-        return output_dict  
-
+        return output_dict
+    
+    def query_search_modified(self, query, win_size=1, limit=3, offset=0):
+        '''
+        This function performs searching a query in database and returs
+        a dictionary filemname:query in string format
+        It uses a new search function named def unite_extended_limit_offset() and
+        for that it takes limit and offset as it's arguments
+        @param query: query to search
+        @param win_size: a size of a context window
+        @param limit: number of documents to return
+        @param offset: from which document to start
+        @return: dictionary {filename: [query(str)]}
+        '''
+        if not isinstance(query, str) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type! %s, %s' % (query, win_size))
+        
+        output_dict = {} 
+        dictionary = self.unite_extended_limit_offset(query, win_size,limit, offset)
+        # print(dictionary,'dictionary')
+        for key, value in dictionary.items():
+            # print(value,'value')
+            for window in value:
+                string = window.highlight_window()
+                # print(string,'string')
+                output_dict.setdefault(key, []).append(string)
+        # print(output_dict,'dict')        
+        return output_dict
+    
     def qulim_search(self, query, win_size, limit, offset, doc_limof):
         '''
         This function performs searching a query in database and returs
@@ -288,10 +362,59 @@ class SearchEngine(object):
         return output_dict 
         
    
-       
-
-
-
-
-
+    def qulim_search_modified(self, query, win_size=1, limit=3, offset=0, doc_limof=[(3,0),(3,0),(3,0)]):
+        '''
+        This function performs searching a query in database and returs
+        a dictionary filemname:query in string format
+        @param query: query to search
+        @param win_size: a size of a context window
+        @param limit: max number of documents to show
+        @param offset: document number to start with
+        @param doc_limof: list of pairs that show limit and offset of each concrete document,
+        no more quotes can be shown than this doclimit
+        @return: dictionary {filename: [query(str)]}
+        '''
+      
+        if not isinstance(query, str) or not isinstance(limit, int) or not isinstance(offset, int):
+            raise TypeError('Input has an unappropriate type! %s, %s, %s' % (query, limit, offset))
+        
+        # dictionary for results
+        output_dict = dict()
+        # number of document
+        qunum = 0
+        dictionary = self.unite_extended_limit_offset(query, win_size,limit,offset)
+        # мне не нужно сравнивать с лимитами и офсетами по документам,
+        # так как я уже использую новую функцию, где они уже учтены
+        # поэтому я просто перебираю файлы в отсортированном словаре
+        for filename in sorted(dictionary):
+            # тут я создаю список для каждого файла
+            output_dict.setdefault(filename, [])
+            # достаю все limit цитат из словаря по данному файлу
+            all_quotes  = dictionary[filename]
+            # print(all_quotes,'all_quotes')
+            # limit for document
+            qulim = doc_limof[qunum][0]
+            if not qulim:
+                qulim = 3
+            # print(qulim, 'qulim')
+            # offset for document
+            quset = doc_limof[qunum][1]
+            if not quset:
+                quset = 0
+            #print(quset,'quset')
+            for num, quote in enumerate (all_quotes):
+                #print('I am in the second for circle!!!')
+                #print(num,'num!!!')
+                if num == qulim + quset:
+                    break
+                if num >= quset and num < qulim + quset:
+                    #print(quset,'quset')
+                    #print(qulim + quset,'qulim + quset')
+                    output_dict[filename].append(quote.highlight_window())
+                    #print("I got a quote!") 
+                    # print(quote,'quote!!!')
+            qunum += 1         
+        # print(output_dict, 'output_dict')        
+        return output_dict 
+          
 
