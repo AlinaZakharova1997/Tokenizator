@@ -125,6 +125,53 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_search_one.txt')
         os.remove('test_search_two.txt')
         os.remove('test_search_three.txt')
+   
+    def test_dict_many_files_limit_offset_one(self):
+        test_file_one = open('test_search_1.txt', 'w') 
+        test_file_one.write(' Ф 12 !!! @ # Alina Zakharova is a student)))')
+        test_file_one.close()
+        test_file_two = open('test_search_2.txt', 'w') 
+        test_file_two.write('Alina Zakharova loves big and red apples)))')
+        test_file_two.close()
+        test_file_three = open('test_search_3.txt', 'w') 
+        test_file_three.write('Little Alina Zakharova is a student)))')
+        test_file_three.close()
+        self.indexator.get_index_with_line('test_search_1.txt')
+        self.indexator.get_index_with_line('test_search_2.txt')
+        self.indexator.get_index_with_line('test_search_3.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        result = self.search.get_dict_many_tokens_limit_offset('Alina Zakharova', limit=3, offset=0)
+        cool_result = {'test_search_1.txt': [Position_Plus(0,14,19), Position_Plus(0,20,29)],
+                       'test_search_2.txt':[Position_Plus(0,0,5),Position_Plus(0,6,15)],
+                       'test_search_3.txt':[Position_Plus(0,7,12),Position_Plus(0,13,22)]}
+        self.assertEqual(result, cool_result)
+        os.remove('test_search_1.txt')
+        os.remove('test_search_2.txt')
+        os.remove('test_search_3.txt')
+        
+    def test_dict_many_files_limit_offset_two(self):
+        test_file_one = open('test_search_1.txt', 'w') 
+        test_file_one.write(' Ф 12 !!! @ # Alina Zakharova is a student)))')
+        test_file_one.close()
+        test_file_two = open('test_search_2.txt', 'w') 
+        test_file_two.write('Alina Zakharova loves big and red apples)))')
+        test_file_two.close()
+        test_file_three = open('test_search_3.txt', 'w') 
+        test_file_three.write('Little Alina Zakharova is a student)))')
+        test_file_three.close()
+        self.indexator.get_index_with_line('test_search_1.txt')
+        self.indexator.get_index_with_line('test_search_2.txt')
+        self.indexator.get_index_with_line('test_search_3.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        result = self.search.get_dict_many_tokens_limit_offset('Alina Zakharova', limit=2, offset=0)
+        cool_result = {'test_search_1.txt': [Position_Plus(0,14,19), Position_Plus(0,20,29)],
+                       'test_search_2.txt':[Position_Plus(0,0,5),Position_Plus(0,6,15)]}
+        self.assertEqual(result, cool_result)
+        os.remove('test_search_1.txt')
+        os.remove('test_search_2.txt')
+        os.remove('test_search_3.txt')         
 
     def test_emptiness(self):
         test_file_one = open('test_search_one.txt', 'w') 
@@ -481,4 +528,5 @@ class TestMyCode(unittest.TestCase):
        
 if __name__ == '__main__':
     unittest.main()        
+
 
