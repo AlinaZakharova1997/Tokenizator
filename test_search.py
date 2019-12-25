@@ -6,6 +6,7 @@ import shelve
 import indexer
 from indexer import Indexer, Position_Plus
 from windows import Context_Window
+from collections.abc import Generator
 
 class TestMyCode(unittest.TestCase):
     
@@ -171,7 +172,57 @@ class TestMyCode(unittest.TestCase):
         self.assertEqual(result, cool_result)
         os.remove('test_search_1.txt')
         os.remove('test_search_2.txt')
-        os.remove('test_search_3.txt')         
+        os.remove('test_search_3.txt')
+        
+    def test_position_generator(self):
+        lists = [[Position_Plus(0,1,5),Position_Plus(20,4,5),Position_Plus(30,0,6)],
+                 [Position_Plus(10,4,9),Position_Plus(10,9,15)]]
+        del self.indexator
+        self.search = SearchEngine('database')
+        result = list(self.search.position_generator(lists))
+        fine_result = [Position_Plus(0,1,5),Position_Plus(10,4,9),Position_Plus(10,9,15),
+                       Position_Plus(20,4,5),Position_Plus(30,0,6)]
+        self.assertEqual(result, fine_result)        
+
+    def test_isgenerator(self):
+        lists = [[Position_Plus(0,1,5),Position_Plus(20,4,5),Position_Plus(30,0,6)],
+                 [Position_Plus(10,4,9),Position_Plus(10,9,15)]]
+        del self.indexator
+        self.search = SearchEngine('database')
+        result = self.search.position_generator(lists)
+        self.assertIsInstance(result, Generator)
+
+        
+    def test_input_generator_error(self):
+        del self.indexator
+        self.search = SearchEngine('database')
+        with self.assertRaises(TypeError):
+            self.search.position_generator(1997, "acb",'12')
+        
+        
+    def test_dict_many_files_limit_generator(self):
+        test_file_one = open('test_search_1.txt', 'w') 
+        test_file_one.write(' Ф 12 !!! @ # Alina Zakharova is a student)))')
+        test_file_one.close()
+        test_file_two = open('test_search_2.txt', 'w') 
+        test_file_two.write('Alina Zakharova loves big and red apples)))')
+        test_file_two.close()
+        test_file_three = open('test_search_3.txt', 'w') 
+        test_file_three.write('Little Alina Zakharova is a student)))')
+        test_file_three.close()
+        self.indexator.get_index_with_line('test_search_1.txt')
+        self.indexator.get_index_with_line('test_search_2.txt')
+        self.indexator.get_index_with_line('test_search_3.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        result = self.search.get_dict_many_tokens_limit_offset_generator('Alina Zakharova', limit=2, offset=0)
+        cool_result = {'test_search_1.txt': [Position_Plus(0,14,19), Position_Plus(0,20,29)],
+                       'test_search_2.txt':[Position_Plus(0,0,5),Position_Plus(0,6,15)]}
+        for res in result:
+            self.assertEqual(list(result[res]), cool_result[res])
+        os.remove('test_search_1.txt')
+        os.remove('test_search_2.txt')
+        os.remove('test_search_3.txt')     
 
     def test_emptiness(self):
         test_file_one = open('test_search_one.txt', 'w') 
@@ -343,6 +394,7 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_unite_extended_1.txt')
         os.remove('test_unite_extended_2.txt')
         os.remove('test_unite_extended_3.txt')
+           
   
     def test_query_search(self):
        test_file_one = open('test_query_search.txt', 'w') 
@@ -626,9 +678,12 @@ class TestMyCode(unittest.TestCase):
         os.remove('test_qulim_search_1.txt')
         os.remove('test_qulim_search_2.txt')
         
+    
+        
 
                     
        
 if __name__ == '__main__':
     unittest.main()        
+
 
