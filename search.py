@@ -118,6 +118,56 @@ class SearchEngine(object):
             # sort positions
             output_dict[filename].sort()
         return output_dict
+    
+    def get_dict_many_tokens_limit_offset_generator(self,tok_str, limit=3, offset=0):
+        """
+        This function performs searching for positions of given tokens
+        @param tok_str: str containing tokens
+        @param limit: number of files to be returned
+        @param offset: from which file to start
+        @return: dictionary, where a key is a filename
+        and a value is a position generator    
+        """
+
+        if not isinstance(tok_str, str):
+            raise TypeError('Input has an unappropriate type!')
+        
+        if not isinstance(limit, int) or not isinstance (offset, int):
+            raise TypeError('Input has an unappropriate type!')
+        
+        if not tok_str:
+            return {}
+        
+        # в случае, если оффсет отрицательный
+        if offset < 0:
+            offset = 0
+            
+        big_dict_files = []
+        # словарь вида имя файла:список позиций 
+        lists = {}
+        for token in self.tokenizator.token_gen(tok_str):
+            # ищу токен с строковом представлении
+            found = self.get_dict(token.s)
+            # добавляю в список
+            big_dict_files.append(set(found))
+            # заполняю словарь lists
+            for file in found:
+                lists.setdefault(file,[]).append(found[file])
+            
+        files = big_dict_files[0]    
+        for file_dict in big_dict_files[1:]:
+            #пересечение названий файлов
+            files = files.intersection(set(file_dict)) 
+            
+        # сортирую и отсекаю результаты по лимиту и оффсету    
+        resulted_files = sorted(files)[offset: limit+offset]
+        # создаю результурующий словарь
+        output_dict = {}
+        # записываю в него нужные результаты
+        for filename in resulted_files:
+            for token in self.tokenizator.token_gen(tok_str):
+               output_dict[filename] = self.position_generator(lists[filename]) 
+        return output_dict
             
     def unite_all(self,dictionary,win_size):
        '''
@@ -163,6 +213,7 @@ class SearchEngine(object):
       
        return output_dict
     
+    
     def unite_extended(self, query, win_size):
         '''
         This function unites extended windows in a dictionary
@@ -205,7 +256,6 @@ class SearchEngine(object):
         return dictionary
         
         
-
     def unite_extended_limit_offset(self, query, win_size, limit=3, offset=0):
         '''
         This function unites extended windows in a dictionary(this dictionary
@@ -416,5 +466,32 @@ class SearchEngine(object):
             qunum += 1         
         # print(output_dict, 'output_dict')        
         return output_dict 
-          
+           
 
+    def position_generator(self, lists):
+        '''
+        This function generates positions
+        @param lists: list of lists of positions
+        It chooses a position with a min frequency upon firsts elements of each list given and yeilds it
+        '''
+        # превращаю списки в итераторы. итератор - генератор, осуществляющий итерацию.    
+        iters = [iter(x) for x in  lists]
+        # список с первыми элементами списков
+        firsts = [next(it) for it in iters]
+        # print(firsts,'firsts')
+        while firsts:
+            position_iter = min(firsts)
+            yield position_iter
+            # print(position_iter,'position_iter')
+            # номер массива, из которого я взяла этот элемент
+            position_iter_pos = firsts.index(position_iter)
+            try:
+                # переходим к следующему элементу в этом списке
+                firsts[position_iter_pos] = next(iters[position_iter_pos]) 
+            except StopIteration:
+                # если один из списков закончился, то удаляем и возвращаем удаленный элемент
+                # те первый элемент такого списка и его итератор нам больше не нужны и мы их удаляем
+                iters.pop(position_iter_pos)
+                firsts.pop(position_iter_pos)
+
+   
