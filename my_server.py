@@ -79,12 +79,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         # my list of (doclim,docset) pairs
         docs_list = []
         for num in range(limit+1):
-            print('I am reading offsets and limits for quotes')
+            # print('I am reading offsets and limits for quotes')
             quote_act = form.getvalue("action%d" % num)
             doclim = form.getvalue('doc%dlim' % num)
-            print(doclim, 'doclim')
+            # print(doclim, 'doclim')
             docset = form.getvalue('doc%dset' % num)
-            print(docset,'docset')
+            # print(docset,'docset')
             if not doclim  or doclim == "None":
                 doclim = 3
             else:
@@ -95,17 +95,26 @@ class RequestHandler(BaseHTTPRequestHandler):
                 docset = int(docset)
             if docset < 0:
                 docset = 0
-            print('I am reading conditions for quote buttons')    
+            # print('I am reading conditions for quote buttons')
+            # надо чтобы при перелистывании на другую страницу,
+            # оффсет и лимит для цитат сбрасывались до базовых
+            # если я на 1 стр перелистнула цитаты,
+            # то кнопка "назад" для цитат стала активной
+            # но когда я перелистываю на 2 стр я хочу,
+            # чтобы кнопка назад для цитат с новой стр,
+            # которые я еще НЕ листала, была НЕ активной
+            if doc_act  == "forward":
+                docset = 0
             if quote_act == "back" and docset != 0:
                 docset = docset - doclim
-                print(docset, 'docset for back')
+                # print(docset, 'docset for back')
             elif quote_act == "forward":
                 docset = docset + doclim
-                print(docset, 'docset for forward')
+                # print(docset, 'docset for forward')
             elif quote_act == "to the beginning":
                 docset = 0
-            print(docset,'docset as it is')
-            print(doclim, 'doclim as it is')
+            # print(docset,'docset as it is')
+            # print(doclim, 'doclim as it is')
             # я добавляю к лимиту единицу, это чтобы листать цитаты
             # (если есть еще одна после лимита, то можно листать, иначе - кнопка не горит!!! и врут календари)))    
             docs_list.append((doclim+1,docset))   
@@ -120,7 +129,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         doc_limof.append((3,0))    
         print(doc_limof,'doc_limof')
         # здесь лимит по цитатам + 1
-        final = my_search.qulim_search_modified(query, win_size=1, limit+1, offset, doc_limof)
+        final = my_search.qulim_search_modified(query, 1, limit+1, offset, doc_limof)
         # условия горения кнопок по документам
         print(offset, 'offset')
         if offset == 0:
@@ -154,18 +163,20 @@ class RequestHandler(BaseHTTPRequestHandler):
             # условия горения кнопок по цитатам
             print(quote_offset,'quote_offset')
             if quote_offset == 0:
-                self.wfile.write(bytes(""" <input type="submit" name="action"  value="to the beginning"disabled/>
-                                       <input type="submit" name="action"  value="back"disabled/>""", encoding="UTF-8"))
+                self.wfile.write(bytes(""" <input type="submit" name="action%d"  value="to the beginning"disabled/>
+                                       <input type="submit" name="action%d"  value="back"disabled/>""" %(number,number), encoding="UTF-8"))
             else:
-                self.wfile.write(bytes(""" <input type="submit" name="action"  value="to the beginning"/>
-                                       <input type="submit" name="action"  value="back"/>""", encoding="UTF-8"))
+                self.wfile.write(bytes(""" <input type="submit" name="action%d"  value="to the beginning"/>
+                                       <input type="submit" name="action%d"  value="back"/>""" %(number,number), encoding="UTF-8"))
             print(len(final[filename]),'len(final[filename])')
             print(quote_lim, 'quote_lim')
+            print(limit,'limit')
+            print(offset,'offset')
             # quote_lim на самом деле уже содержит +1, поэтому еще раз прибавлять не надо
             if len(final[filename]) < quote_lim:
-                self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"disabled/>""", encoding="UTF-8"))
+                self.wfile.write(bytes(""" <input type="submit" name="action%d"  value="forward"disabled/>""" %number, encoding="UTF-8"))
             elif len(final[filename]) >= quote_lim:
-                self.wfile.write(bytes(""" <input type="submit" name="action"  value="forward"/>""", encoding="UTF-8"))    
+                self.wfile.write(bytes(""" <input type="submit" name="action%d"  value="forward"/>""" %number, encoding="UTF-8"))    
             # the beginning of unordered list
             self.wfile.write(bytes('<ul>', encoding="utf-8"))
             # вывожу цитаты до лимита по цитатам - 1
@@ -177,6 +188,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 def main():
     my_server = HTTPServer(('', 80), RequestHandler)
     my_server.serve_forever()
-
+    
 if __name__ == "__main__":
     main()
+
