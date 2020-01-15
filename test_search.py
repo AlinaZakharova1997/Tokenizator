@@ -198,7 +198,65 @@ class TestMyCode(unittest.TestCase):
         self.search = SearchEngine('database')
         with self.assertRaises(TypeError):
             self.search.position_generator(1997, "acb",'12')
+     
+    def test_context_generator(self):
+        test_file_one = open('test_window_one.txt', 'w') 
+        test_file_one.write('Alina Zakharova is a student)))')
+        test_file_one.close()
+        self.indexator.get_index_with_line('test_window_one.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        positions = [Position_Plus(0,0,5),Position_Plus(0,16,18)]
+        result = list(self.search.context_generator('test_window_one.txt',positions,1))
+        cool_result = [Context_Window('Alina Zakharova is a student)))',[Position_Plus(0,0,5)],0,15),
+                       Context_Window('Alina Zakharova is a student)))',[Position_Plus(0,16,18)],6,20)]
+        self.assertEqual(result, cool_result)
+        os.remove('test_window_one.txt')
         
+    def test_context_generator_wrong_input(self):
+        del self.indexator
+        self.search = SearchEngine('database')
+        with self.assertRaises(TypeError):
+            self.search.context_generator(1997, '12')
+            
+    def test_context_gen_uniter_one(self):
+        del self.indexator
+        self.search = SearchEngine('database')
+        generated_input = [
+                       Context_Window('Alina Zakharova is a student.',[Position_Plus(0,0,5)],0,15),
+                       Context_Window('Alina Zakharova is a student.',[Position_Plus(0,16,18)],6,20),
+                       Context_Window('Live fast, die young.',[Position_Plus(1,0,4)],0,8),
+                       Context_Window('Live fast, die young.',[Position_Plus(1,15,20)],11,20)]
+        result = list(self.search.context_gen_uniter(generated_input))
+        cool_result = [Context_Window('Alina Zakharova is a student.',[Position_Plus(0,0,5),Position_Plus(0,16,18)],0,20),
+                       Context_Window('Live fast, die young.',[Position_Plus(1,0,4)],0,8),
+                       Context_Window('Live fast, die young.',[Position_Plus(1,15,20)],11,20)]
+        self.assertEqual(result, cool_result)
+        
+    def test_context_gen_uniter_two(self):
+        del self.indexator
+        self.search = SearchEngine('database')
+        generated_input = [
+                       Context_Window('Live fast, die young.',[Position_Plus(0,0,4)],0,8),
+                       Context_Window('Live fast, die young.',[Position_Plus(0,15,20)],11,20),
+                       Context_Window('Alina Zakharova is a student.',[Position_Plus(1,0,5)],0,15),
+                       Context_Window('Alina Zakharova is a student.',[Position_Plus(1,16,18)],6,20)]
+        result = list(self.search.context_gen_uniter(generated_input))
+        cool_result = [
+                       Context_Window('Live fast, die young.',[Position_Plus(0,0,4)],0,8),
+                       Context_Window('Live fast, die young.',[Position_Plus(0,15,20)],11,20),
+                       Context_Window('Alina Zakharova is a student.',[Position_Plus(1,0,5),Position_Plus(1,16,18)],0,20)]
+        self.assertEqual(result, cool_result)    
+
+    """def test_sentence_generator(self):
+        del self.indexator
+        self.search = SearchEngine('database')
+        generated_input = [Context_Window('Alina Zakharova is a student)))',[Position_Plus(0,0,5),Position_Plus(0,16,18)],0,20),
+                       Context_Window('Live fast, die young',[Position_Plus(1,0,4)],0,8)]
+        result = list(self.search.sentence_generator(generated_input))
+        cool_result = [Context_Window('Alina Zakharova is a student.',[Position_Plus(0,0,5),Position_Plus(0,16,18)],0,29),
+                       Context_Window('Live fast, die young.',[Position_Plus(1,0,4)],0,21)]
+        self.assertEqual(result, cool_result)"""
         
     def test_dict_many_files_limit_generator(self):
         test_file_one = open('test_search_1.txt', 'w') 
