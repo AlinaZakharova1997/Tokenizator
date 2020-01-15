@@ -101,11 +101,13 @@ class SearchEngine(object):
             
         big_dict_files = []
         for token in self.tokenizator.token_gen(tok_str):
-            big_dict_files.append(self.get_dict(token.s))#выделяем токены и зап-ем в список
+            # выделяем токены и зап-ем в список
+            big_dict_files.append(self.get_dict(token.s))  
             
         files = set(big_dict_files[0])    
         for file_dict in big_dict_files[1:]:
-            files = files.intersection(set(file_dict)) #пересечение названия файлов
+            # пересечение названия файлов
+            files = files.intersection(set(file_dict))
             
         # сортирую и отсекаю результаты по лимиту и оффсету    
         resulted_files = sorted(files)[offset: limit+offset]
@@ -156,7 +158,7 @@ class SearchEngine(object):
             
         files = big_dict_files[0]    
         for file_dict in big_dict_files[1:]:
-            #пересечение названий файлов
+            # пересечение названий файлов
             files = files.intersection(set(file_dict)) 
             
         # сортирую и отсекаю результаты по лимиту и оффсету    
@@ -174,12 +176,11 @@ class SearchEngine(object):
        This function unites context windows
        @param dictionary: input dictionary filename:Positions
        @param win_size: a size of a context window
-       @return: a dictionary filename:Context Windows
+       @return: a dictionary filename:Context Windows генератор контекстных окон
        '''
        if not isinstance(dictionary, dict):
             raise TypeError('Input has an unappropriate type!')      
        output_dict = {}
-       
        # value is an array of positions
        for key,value in dictionary.items():
            # создаем список каждый раз, чтобы у каждого окна был свой список позиций  
@@ -213,7 +214,6 @@ class SearchEngine(object):
       
        return output_dict
     
-    
     def unite_extended(self, query, win_size):
         '''
         This function unites extended windows in a dictionary
@@ -222,7 +222,7 @@ class SearchEngine(object):
         extends these windows and finally unites them once again
         @param query: string query
         @param win_size: size of a window
-        @return: dictionary with extended and reunated windows
+        @return: dictionary with extended and reunated windows генератор окон!!!
         '''
         
         if not isinstance(query, str) or not isinstance(win_size, int):
@@ -256,6 +256,7 @@ class SearchEngine(object):
         return dictionary
         
         
+
     def unite_extended_limit_offset(self, query, win_size, limit=3, offset=0):
         '''
         This function unites extended windows in a dictionary(this dictionary
@@ -267,7 +268,7 @@ class SearchEngine(object):
         @param win_size: size of a window
         @param limit: number of documents to return
         @param offset: from which document to start
-        @return: dictionary with extended and reunated windows
+        @return: dictionary with extended and reunated windows генератор расширенных и объединенных окон
         '''
         
         if not isinstance(query, str) or not isinstance(win_size, int):
@@ -422,7 +423,7 @@ class SearchEngine(object):
         @param offset: document number to start with
         @param doc_limof: list of pairs that show limit and offset of each concrete document,
         no more quotes can be shown than this doclimit
-        @return: dictionary {filename: [query(str)]}
+        @return: dictionary {filename: [query(str)]} тут тоже генератор
         '''
       
         if not isinstance(query, str) or not isinstance(limit, int) or not isinstance(offset, int):
@@ -494,4 +495,64 @@ class SearchEngine(object):
                 iters.pop(position_iter_pos)
                 firsts.pop(position_iter_pos)
 
-   
+    def context_generator(self, filename, position_generator, win_size):
+        """
+        This function creates context windows from a given
+        file using the position generator
+        @param filename: a name of a file
+        @param position_generator: generator which generates positions
+        @param win_size: a size of a future context window
+        @return: contexts windows, i.e. objects of Context_Window class
+        """
+        if not isinstance(filename, str) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type!')
+        for pos in position_generator:
+            window = Context_Window.get_window(filename, pos, win_size)
+            yield window
+            
+    def context_gen_uniter(self, context_generator):
+        """
+        This function checks if generated windows intersect and unites them
+        @param context_generator: generator of context windows
+        @return: united context windows
+        """
+        # делаю из входных данных итератор, чтобы итераторить))
+        iterator = context_generator.__iter__()
+        # первое окно в итераторе, начало прохода
+        previous = iterator.__next__()
+        # print(previous,'previous')
+        for window in context_generator:
+            # заворачиваю в блок, чтобы избежать ошибки
+            try:
+                # второе окно после первого
+                next_window = iterator.__next__()
+                # print(next_window,'next_window')
+                # проверяю на пересечение и если что - объединяю
+                if previous.is_crossed(next_window):
+                    previous.get_united_window(next_window)
+                    # print('united window yielded') 
+                else:
+                    yield previous
+                    # print(previous,'I just yield window')
+                    previous = next_window        
+            except StopIteration:
+                print('I stop the iteration')
+        yield previous       
+            
+
+        
+    def sentence_generator(self, context_gen_uniter):
+       """
+       This function generates sentences using the context_gen_uniter
+       @param context_gen_uniter: generator of united context windows
+       """
+       for window in context_gen_uniter:
+           yield window.extend_window()
+           
+           
+
+
+
+
+             
+       
