@@ -232,6 +232,67 @@ class TestMyCode(unittest.TestCase):
                        Context_Window('Live fast, die young.',[Position_Plus(1,0,4)],0,8),
                        Context_Window('Live fast, die young.',[Position_Plus(1,15,20)],11,20)]
         self.assertEqual(result, cool_result)
+
+    def test_get_context_gen(self):
+        test_file_one = open('test_context_gen_1.txt', 'w') 
+        test_file_one.write('Smart Student Alina Zakharova tries to write programs.')
+        test_file_one.close()
+        test_file_two = open('test_context_gen_2.txt', 'w') 
+        test_file_two.write('Alina Zakharova is a student!!')
+        test_file_two.close()
+        test_file_three = open('test_context_gen_3.txt', 'w')
+        test_file_three.write('Long live rock n roll!')
+        test_file_three.close()
+        test_file_four = open('test_context_gen_4.txt', 'w')
+        test_file_four.write('Funny little Alina Zakharova loves rock music.')
+        test_file_four.close()
+        self.indexator.get_index_with_line('test_context_gen_1.txt')
+        self.indexator.get_index_with_line('test_context_gen_2.txt')
+        self.indexator.get_index_with_line('test_context_gen_3.txt')
+        self.indexator.get_index_with_line('test_context_gen_4.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        query = 'Zakharova'
+        result = self.search.get_context_gen(query, win_size=1,limit=2,offset=0)
+        fine_result = {'test_context_gen_1.txt':[Context_Window('Smart Student Alina Zakharova tries to write programs.',[Position_Plus(0,20,29)], 14, 35)],
+                       'test_context_gen_2.txt':[Context_Window('Alina Zakharova is a student!!',[Position_Plus(0,6,15)], 0, 18)]}
+        for item in result:
+            self.assertEqual(list(result[item]), fine_result[item])
+        os.remove('test_context_gen_1.txt')
+        os.remove('test_context_gen_2.txt')
+        os.remove('test_context_gen_3.txt')
+        os.remove('test_context_gen_4.txt')
+
+
+    def test_get_context_gen_two(self):
+        test_file_one = open('test_context_gen_1.txt', 'w') 
+        test_file_one.write('Smart Student Alina Zakharova tries to write programs.')
+        test_file_one.close()
+        test_file_two = open('test_context_gen_2.txt', 'w') 
+        test_file_two.write('Alina Zakharova is a student!!')
+        test_file_two.close()
+        test_file_three = open('test_context_gen_3.txt', 'w')
+        test_file_three.write('Long live rock n roll!')
+        test_file_three.close()
+        test_file_four = open('test_context_gen_4.txt', 'w')
+        test_file_four.write('Funny little Alina Zakharova loves rock music.')
+        test_file_four.close()
+        self.indexator.get_index_with_line('test_context_gen_1.txt')
+        self.indexator.get_index_with_line('test_context_gen_2.txt')
+        self.indexator.get_index_with_line('test_context_gen_3.txt')
+        self.indexator.get_index_with_line('test_context_gen_4.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        query = 'Zakharova'
+        result = self.search.get_context_gen(query, win_size=1,limit=2,offset=1)
+        fine_result = {'test_context_gen_2.txt':[Context_Window('Alina Zakharova is a student!!',[Position_Plus(0,6,15)], 0, 18)],
+                       'test_context_gen_4.txt':[Context_Window('Funny little Alina Zakharova loves rock music.',[Position_Plus(0,19,28)], 13, 34)]}
+        for item in result:
+            self.assertEqual(list(result[item]), fine_result[item])
+        os.remove('test_context_gen_1.txt')
+        os.remove('test_context_gen_2.txt')
+        os.remove('test_context_gen_3.txt')
+        os.remove('test_context_gen_4.txt')    
         
     def test_context_gen_uniter_two(self):
         del self.indexator
@@ -248,15 +309,87 @@ class TestMyCode(unittest.TestCase):
                        Context_Window('Alina Zakharova is a student.',[Position_Plus(1,0,5),Position_Plus(1,16,18)],0,20)]
         self.assertEqual(result, cool_result)    
 
-    """def test_sentence_generator(self):
+    def test_sentence_generator(self):
         del self.indexator
         self.search = SearchEngine('database')
-        generated_input = [Context_Window('Alina Zakharova is a student)))',[Position_Plus(0,0,5),Position_Plus(0,16,18)],0,20),
-                       Context_Window('Live fast, die young',[Position_Plus(1,0,4)],0,8)]
+        generated_input = [Context_Window('Alina Zakharova is a student.',[Position_Plus(0,0,5),Position_Plus(0,16,18)],0,20),
+                       Context_Window('Live fast, die young.',[Position_Plus(1,0,4)],0,8)]
         result = list(self.search.sentence_generator(generated_input))
         cool_result = [Context_Window('Alina Zakharova is a student.',[Position_Plus(0,0,5),Position_Plus(0,16,18)],0,29),
                        Context_Window('Live fast, die young.',[Position_Plus(1,0,4)],0,21)]
-        self.assertEqual(result, cool_result)"""
+        self.assertEqual(result, cool_result)
+        
+    def test_sentence_generator_uniter(self):
+        del self.indexator
+        self.search = SearchEngine('database')
+        generated_input = [Context_Window('Alina Zakharova is a student.',[Position_Plus(0,0,5),Position_Plus(0,16,18)],0,29),
+                           Context_Window('Live fast, die young. Go Go Go Johnny go!',[Position_Plus(1,15,20)],0,21),
+                           Context_Window('Live fast, die young. Go Go Go Johnny go!',[Position_Plus(1,11,14)],11,41) ]
+
+        result = list(self.search.sentence_generator_uniter(generated_input))
+        cool_result = [Context_Window('Alina Zakharova is a student.',[Position_Plus(0,0,5),Position_Plus(0,16,18)],0,29),
+                       Context_Window('Live fast, die young. Go Go Go Johnny go!',[Position_Plus(1,15,20),Position_Plus(1,11,14)],0,41)]
+        self.assertEqual(result, cool_result)
+
+    def test_get_sentence_gen(self):
+        test_file_one = open('test_sentence_gen_1.txt', 'w') 
+        test_file_one.write('Smart Student Alina Zakharova tries to write programs.')
+        test_file_one.close()
+        test_file_two = open('test_sentence_gen_2.txt', 'w') 
+        test_file_two.write('Alina Zakharova is a student!!')
+        test_file_two.close()
+        test_file_three = open('test_sentence_gen_3.txt', 'w')
+        test_file_three.write('Long live rock n roll!')
+        test_file_three.close()
+        test_file_four = open('test_sentence_gen_4.txt', 'w')
+        test_file_four.write('Funny little Alina Zakharova loves rock music.')
+        test_file_four.close()
+        self.indexator.get_index_with_line('test_sentence_gen_1.txt')
+        self.indexator.get_index_with_line('test_sentence_gen_2.txt')
+        self.indexator.get_index_with_line('test_sentence_gen_3.txt')
+        self.indexator.get_index_with_line('test_sentence_gen_4.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        query = 'Zakharova'
+        result = self.search.get_sentence_gen(query, win_size=1,limit=2,offset=1)
+        fine_result = {'test_context_gen_2.txt':[Context_Window('Alina Zakharova is a student!!',[Position_Plus(0,6,15)], 0, 30)],
+                       'test_context_gen_4.txt':[Context_Window('Funny little Alina Zakharova loves rock music.',[Position_Plus(0,19,28)], 0, 46)]}
+        for item in result:
+            self.assertEqual(list(result[item]), fine_result[item])
+        os.remove('test_sentence_gen_1.txt')
+        os.remove('test_sentence_gen_2.txt')
+        os.remove('test_sentence_gen_3.txt')
+        os.remove('test_sentence_gen_4.txt')
+        
+    def test_get_sentence_gen_two(self):
+        test_file_one = open('test_sentence_gen_1.txt', 'w') 
+        test_file_one.write('Smart Student Alina Zakharova tries to write programs.')
+        test_file_one.close()
+        test_file_two = open('test_sentence_gen_2.txt', 'w') 
+        test_file_two.write('Alina Zakharova is a student!!')
+        test_file_two.close()
+        test_file_three = open('test_sentence_gen_3.txt', 'w')
+        test_file_three.write('Long live rock n roll!')
+        test_file_three.close()
+        test_file_four = open('test_sentence_gen_4.txt', 'w')
+        test_file_four.write('Funny little Alina Zakharova loves rock music.')
+        test_file_four.close()
+        self.indexator.get_index_with_line('test_sentence_gen_1.txt')
+        self.indexator.get_index_with_line('test_sentence_gen_2.txt')
+        self.indexator.get_index_with_line('test_sentence_gen_3.txt')
+        self.indexator.get_index_with_line('test_sentence_gen_4.txt')
+        del self.indexator
+        self.search = SearchEngine('database')
+        query = 'Zakharova'
+        result = self.search.get_sentence_gen(query, win_size=1,limit=2,offset=0)
+        fine_result = {'test_context_gen_1.txt':[Context_Window('Smart Student Alina Zakharova tries to write programs.',[Position_Plus(0,20,29)], 0, 54)],
+                       'test_context_gen_2.txt':[Context_Window('Alina Zakharova is a student!!',[Position_Plus(0,6,15)], 0, 30)]}
+        for item in result:
+            self.assertEqual(list(result[item]), fine_result[item])
+        os.remove('test_sentence_gen_1.txt')
+        os.remove('test_sentence_gen_2.txt')
+        os.remove('test_sentence_gen_3.txt')
+        os.remove('test_sentence_gen_4.txt')    
         
     def test_dict_many_files_limit_generator(self):
         test_file_one = open('test_search_1.txt', 'w') 
