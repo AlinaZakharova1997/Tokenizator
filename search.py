@@ -31,6 +31,7 @@ class SearchEngine(object):
 
     def __del__(self):
         self.database.close()    
+
             
     def get_dict (self,tok_str):
         """
@@ -47,6 +48,7 @@ class SearchEngine(object):
             return self.database[tok_str]
         else:
             return {}
+
 
     def get_dict_many_tokens(self,tok_str):
         """
@@ -75,6 +77,7 @@ class SearchEngine(object):
             # sort positions
             output_dict[filename].sort()
         return output_dict
+
     
     def get_dict_many_tokens_limit_offset(self,tok_str, limit=3, offset=0):
         """
@@ -120,6 +123,7 @@ class SearchEngine(object):
             # sort positions
             output_dict[filename].sort()
         return output_dict
+
     
     def get_dict_many_tokens_limit_offset_generator(self,tok_str, limit=3, offset=0):
         """
@@ -170,6 +174,7 @@ class SearchEngine(object):
             for token in self.tokenizator.token_gen(tok_str):
                output_dict[filename] = self.position_generator(lists[filename]) 
         return output_dict
+
             
     def unite_all(self,dictionary,win_size):
        '''
@@ -213,7 +218,18 @@ class SearchEngine(object):
                    i+=1
       
        return output_dict
-    
+
+    def get_context_generator(self,dictionary,win_size):
+        '''
+        This function unites context windows
+        @param dictionary: input dictionary filename:Positions
+        @param win_size: a size of a context window
+        @return: a dictionary filename:Context Windows generator
+        '''
+        if not isinstance(dictionary, dict):
+            raise TypeError('Input has an unappropriate type!')
+
+        
     def unite_extended(self, query, win_size):
         '''
         This function unites extended windows in a dictionary
@@ -246,15 +262,14 @@ class SearchEngine(object):
             while i < len(win_array)-1:
                 # print('I am in while')
                 if win_array[i].is_crossed(win_array[i+1]):
-                    #print(win_array[i].is_crossed(win_array[i+1]),'is crossed')
+                    # print(win_array[i].is_crossed(win_array[i+1]),'is crossed')
                     win_array[i].get_united_window(win_array[i+1])
-                    #print('get_united')
+                    # print('get_united')
                     win_array.remove(win_array[i+1])
                 else:
                     i+=1
         
         return dictionary
-        
         
 
     def unite_extended_limit_offset(self, query, win_size, limit=3, offset=0):
@@ -268,7 +283,7 @@ class SearchEngine(object):
         @param win_size: size of a window
         @param limit: number of documents to return
         @param offset: from which document to start
-        @return: dictionary with extended and reunated windows генератор расширенных и объединенных окон
+        @return: dictionary with extended and reunated windows 
         '''
         
         if not isinstance(query, str) or not isinstance(win_size, int):
@@ -296,15 +311,81 @@ class SearchEngine(object):
             while i < len(win_array)-1:
                 # print('I am in while')
                 if win_array[i].is_crossed(win_array[i+1]):
-                    #print(win_array[i].is_crossed(win_array[i+1]),'is crossed')
+                    # print(win_array[i].is_crossed(win_array[i+1]),'is crossed')
                     win_array[i].get_united_window(win_array[i+1])
-                    #print('get_united')
+                    # print('get_united')
                     win_array.remove(win_array[i+1])
                 else:
                     i+=1
         
         return dictionary
+    
+
+    def get_context_gen(self, query, win_size, limit, offset):
+        '''
+        This function uses a generator of context windows
+        to produce a dictionary with windows generator
+        windows are extended and reunited
+        @param query: string query
+        @param win_size: size of a window
+        @param limit: number of documents to return
+        @param offset: from which document to start
+        @return: dictionary with a generator of extended and reunated windows
+        '''
         
+        if not isinstance(query, str) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type! %s, %s' % (query, win_size))
+        if not isinstance(limit, int) or not isinstance (offset, int):
+            raise TypeError('Input has an unappropriate type!')
+        
+        # получаю словарь вида имя файла - генератор позиций
+        position_gen_dict = self.get_dict_many_tokens_limit_offset_generator(query,limit,offset)
+        # делаю словарь вида имя файла - генератор окон
+        window_gen_dict = dict()
+        for filename in position_gen_dict:
+            window_gen_dict[filename] = self.context_generator(filename, position_gen_dict[filename],win_size)          
+        # делаю словарь вида имя файла - генератор расширенных
+        # и объединенных окон
+        context_dict = dict()
+        # print('i am here')
+        for filename in window_gen_dict:
+            # print('i am extending')
+            context_dict[filename] = self.context_gen_uniter(window_gen_dict[filename])
+            # print(context_dict[filename],'the result of extension')
+        # это результат работы данной функции
+        return context_dict
+        
+    def get_sentence_gen(self, query, win_size, limit, offset):
+        '''
+        This function uses a generator of sentences
+        to produce a dictionary with sentence generator
+        sentences are extended and reunited
+        @param query: string query
+        @param win_size: size of a window
+        @param limit: number of documents to return
+        @param offset: from which document to start
+        @return: dictionary with a generator of extended and reunated sentences
+        '''
+        if not isinstance(query, str) or not isinstance(win_size, int):
+            raise TypeError('Input has an unappropriate type! %s, %s' % (query, win_size))
+        if not isinstance(limit, int) or not isinstance (offset, int):
+            raise TypeError('Input has an unappropriate type!')
+
+        # получаю словарь вида имя файла - генератор расширенных
+        # и объединенных окон
+        context_dict = self.get_context_gen(query, win_size, limit=3, offset=0)
+        # создаю словарь вида имя файла - генератор предложений
+        sentence_dict = dict()
+        for filename in context_dict:
+            sentence_dict[filename] = self.sentence_generator(context_dict[filename])
+        # создаю результурующий словарь с расширенными
+        # и объединенными предложеиями
+        final_sentence_dict = dict()
+        for filename in sentence_dict:
+            final_sentence_dict[filename] = self.sentence_generator_uniter(sentence_dict[filename])
+        # это результат работы данной функции    
+        return final_sentence_dict
+    
     def query_search(self, query, win_size):
         '''
         This function performs searching a query in database and returs
@@ -327,6 +408,7 @@ class SearchEngine(object):
                 output_dict.setdefault(key, []).append(string)
         # print(output_dict,'dict')        
         return output_dict
+
     
     def query_search_modified(self, query, win_size=1, limit=3, offset=0):
         '''
@@ -354,6 +436,7 @@ class SearchEngine(object):
                 output_dict.setdefault(key, []).append(string)
         # print(output_dict,'dict')        
         return output_dict
+
     
     def qulim_search(self, query, win_size, limit, offset, doc_limof):
         '''
@@ -466,9 +549,56 @@ class SearchEngine(object):
                     # print(quote,'quote!!!')
             qunum += 1         
         # print(output_dict, 'output_dict')        
-        return output_dict 
-           
+        return output_dict
+    
+    def qulim_search_modified_gen(self, query, win_size=1, limit=3, offset=0, doc_limof=[(3,0),(3,0),(3,0)]):
+        """
+        This function performs searching a query in database and returs
+        a dictionary filemname:query in string format
+        It uses generators to work faster than the previous function
+        named qulim_search_modified
+        @param query: query to search
+        @param win_size: a size of a context window
+        @param limit: max number of documents to show
+        @param offset: document number to start with
+        @param doc_limof: list of pairs that show limit and offset of each concrete document,
+        no more quotes can be shown than this doclimit
+        @return: dictionary {filename: [query(str)]} 
+        """
+        
+        if not isinstance(query, str) or not isinstance(limit, int) or not isinstance(offset, int):
+            raise TypeError('Input has an unappropriate type! %s, %s, %s' % (query, limit, offset))
+        
+        # dictionary for results
+        output_dict = dict()
+        # number of document
+        qunum = 0
+        # using brand new function with generator))
+        dictionary = self.get_sentence_gen(query, win_size,limit,offset)
+        for filename in sorted(dictionary):
+            qulim = doc_limof[qunum][0]
+            if not qulim:
+                qulim = 3
+            # print(qulim, 'qulim')
+            # offset for document
+            quset = doc_limof[qunum][1]
+            if not quset:
+                quset = 0
+            # print(quset,'quset')
+            output_dict.setdefault(filename, [])
+            for item in range(quset):
+                next(dictionary[item])
+            for item in range(qulim):
+                try:
+                    output_dict[filename].append(next(dictionary[item]).highlight_window())
+                    
+                except StopIteration:
+                    break
 
+            qunum += 1                
+        return output_dict
+
+        
     def position_generator(self, lists):
         '''
         This function generates positions
@@ -495,6 +625,7 @@ class SearchEngine(object):
                 iters.pop(position_iter_pos)
                 firsts.pop(position_iter_pos)
 
+
     def context_generator(self, filename, position_generator, win_size):
         """
         This function creates context windows from a given
@@ -509,7 +640,8 @@ class SearchEngine(object):
         for pos in position_generator:
             window = Context_Window.get_window(filename, pos, win_size)
             yield window
-            
+
+
     def context_gen_uniter(self, context_generator):
         """
         This function checks if generated windows intersect and unites them
@@ -536,23 +668,44 @@ class SearchEngine(object):
                     # print(previous,'I just yield window')
                     previous = next_window        
             except StopIteration:
-                print('I stop the iteration')
+                break
+                # print('I stop the iteration')
         yield previous       
             
 
-        
     def sentence_generator(self, context_gen_uniter):
        """
        This function generates sentences using the context_gen_uniter
        @param context_gen_uniter: generator of united context windows
+       @return: extended windows
        """
        for window in context_gen_uniter:
-           yield window.extend_window()
-           
-           
+           window.extend_window()
+           yield window
 
 
+    def sentence_generator_uniter(self,sentence_generator):
+       """
+       This function checks if generated sentences intersect and unites them
+       @param sentence_generator: generator of sentences
+       @return: extended windows after thier union
+       """ 
+       iterator = sentence_generator.__iter__()
+       previous = iterator.__next__()
+       for extended_window in sentence_generator:
+           try:
+               next_window = iterator.__next__()
+               if previous.is_crossed(next_window):
+                   previous.get_united_window(next_window)
+               else:
+                   yield previous
+                   previous = next_window   
+           except StopIteration:
+               break
+               # print('I stop the iteration')
+       yield previous       
+            
 
-
+   
              
        
