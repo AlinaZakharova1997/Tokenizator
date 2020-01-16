@@ -1,3 +1,4 @@
+
 """
 SearchEngine
 This module does searching for positions of tokens in database
@@ -219,17 +220,7 @@ class SearchEngine(object):
       
        return output_dict
 
-    def get_context_generator(self,dictionary,win_size):
-        '''
-        This function unites context windows
-        @param dictionary: input dictionary filename:Positions
-        @param win_size: a size of a context window
-        @return: a dictionary filename:Context Windows generator
-        '''
-        if not isinstance(dictionary, dict):
-            raise TypeError('Input has an unappropriate type!')
-
-        
+            
     def unite_extended(self, query, win_size):
         '''
         This function unites extended windows in a dictionary
@@ -373,16 +364,22 @@ class SearchEngine(object):
 
         # получаю словарь вида имя файла - генератор расширенных
         # и объединенных окон
-        context_dict = self.get_context_gen(query, win_size, limit=3, offset=0)
+        context_dict = self.get_context_gen(query, win_size, limit, offset)
+        print(list(context_dict), 'context_dict')
         # создаю словарь вида имя файла - генератор предложений
         sentence_dict = dict()
         for filename in context_dict:
             sentence_dict[filename] = self.sentence_generator(context_dict[filename])
+            print(list(sentence_dict[filename]),'sentence_dict[filename]')
         # создаю результурующий словарь с расширенными
         # и объединенными предложеиями
         final_sentence_dict = dict()
         for filename in sentence_dict:
-            final_sentence_dict[filename] = self.sentence_generator_uniter(sentence_dict[filename])
+            try:
+                final_sentence_dict[filename] = self.sentence_generator_uniter(sentence_dict[filename])
+                print(list(final_sentence_dict[filename]),'final!!!!')
+            except StopIteration:
+                break
         # это результат работы данной функции    
         return final_sentence_dict
     
@@ -693,19 +690,22 @@ class SearchEngine(object):
        iterator = sentence_generator.__iter__()
        previous = iterator.__next__()
        for extended_window in sentence_generator:
+           print(extended_window,'extended_window')
            try:
+               # если на вход было всего одно предложение, то в этом месте будет StopIteration?
                next_window = iterator.__next__()
+               print(next_window,'next_window')
                if previous.is_crossed(next_window):
                    previous.get_united_window(next_window)
+                   print(previous,'i united windows!')
                else:
                    yield previous
+                   print(previous,'I could not unite so this is just a window')
                    previous = next_window   
            except StopIteration:
                break
-               # print('I stop the iteration')
+               print('I stop the iteration')
        yield previous       
             
 
-   
-             
-       
+         
