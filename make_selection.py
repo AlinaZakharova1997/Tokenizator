@@ -18,7 +18,38 @@ def log(*args):
     log_file.write(' '.join(str(arg) for arg in args))
     log_file.write('\n')
     log_file.flush()
-    '''print(*args)'''            
+    '''print(*args)'''
+    
+def lemma_generator(lists):
+    '''
+    This function generates lemmas
+    @param lists: list of lists of lemma:[frequency,tag] items
+    It chooses a lemma with a max frequency upon firsts elements of each list given and yeilds it
+    '''
+    # превращаю списки в итераторы. итератор - генератор, осуществляющий итерацию.    
+    iters = [iter(x) for x in  lists]
+    # список с первыми элементами списков
+    firsts = [next(it) for it in iters]
+    # print(firsts,'firsts')
+    while firsts:
+        # нахожу лемму с максимальным значением частоты
+        # функция key возвращает тот объект, по которому идет сортировка, у меня сортировка по частоте!!!
+        lemma_iter = max(firsts, key=lambda lem_tuple: (int(lem_tuple[1])))
+        # lemma_iter = max(firsts) для проги!
+        # print(lemma_iter[1],'lemma_iter[1]')
+        yield (lemma_iter[0],lemma_iter[1],lemma_iter[2])
+        # print(lemma_iter,'lemma_iter')
+        # номер массива, из которого я взяла этот элемент
+        lemma_iter_pos = firsts.index(lemma_iter)
+        try:
+            # переходим к следующему элементу в этом списке
+            firsts[lemma_iter_pos] = next(iters[lemma_iter_pos]) 
+        except StopIteration:
+            # если один из списков закончился, то удаляем и возвращаем удаленный элемент
+            # те первый элемент такого списка и его итератор нам больше не нужны и мы их удаляем
+            iters.pop(lemma_iter_pos)
+            firsts.pop(lemma_iter_pos)    
+    
 # в этом блоке кода я делаю список списков, который потом передам функции def lemma_generator(lists)       
 # перебираю все файлы из директории, где есть частотные словари
 for filename in os.listdir(os.getcwd()):
@@ -29,8 +60,9 @@ for filename in os.listdir(os.getcwd()):
         continue
     file = open(filename, 'r')
     # считываю содержимое файла как словарь, учитывая разделитель
-    dic = csv.reader(file, delimiter=';')
+    dic = csv.reader(file, delimiter=',')
     for string in dic:
+        # print(string,'string')
         # lemma это лемма слова
         lemma = string[0]
         # print(lemma,'lemma')
@@ -49,53 +81,48 @@ for filename in os.listdir(os.getcwd()):
 # log(total_list)
 
 
-def lemma_generator(lists):
-    '''
-    This function generates lemmas
-    @param lists: list of lists of lemma:[frequency,tag] items
-    It chooses a lemma with a max frequency upon firsts elements of each list given and yeilds it
-    '''
-    # превращаю списки в итераторы. итератор - генератор, осуществляющий итерацию.    
-    iters = [iter(x) for x in  lists]
-    # список с первыми элементами списков
-    firsts = [next(it) for it in iters]
-    # print(firsts,'firsts')
-    while firsts:
-        # нахожу лемму с максимальным значением частоты
-        # функция key возвращает тот объект, по которому идет сортировка, у меня сортировка по частоте!!!
-        lemma_iter = max(firsts, key=lambda lem_tuple: (int(lem_tuple[1])))
-        # lemma_iter = max(firsts) для проги!
-        yield (lemma_iter[0],lemma_iter[2])
-        print(lemma_iter,'lemma_iter')
-        # номер массива, из которого я взяла этот элемент
-        lemma_iter_pos = firsts.index(lemma_iter)
-        try:
-            # переходим к следующему элементу в этом списке
-            firsts[lemma_iter_pos] = next(iters[lemma_iter_pos]) 
-        except StopIteration:
-            # если один из списков закончился, то удаляем и возвращаем удаленный элемент
-            # те первый элемент такого списка и его итератор нам больше не нужны и мы их удаляем
-            iters.pop(lemma_iter_pos)
-            firsts.pop(lemma_iter_pos)
 
-# открываю файл с конструкциями и леммами
-constrs = open('CONSTRS.csv', 'r')
 # множество пройденных лемм            
 already_found_lemmas = set()
-contains = True
+# множество конструкций, в которые вошли все леммы из множества лемм
+constr_set = list()
+# результирующий файл со списком конструкций
+final_list_constr = open("fina_list_constr.txt", "w")
+# сумма частот в процессе генерации лемм
+summary = 0
+# общая сумма всех частот по всем частям речи
+total = 122377
 # начало цикла по генератору
-for constr in constrs:
-    # генератор берет список списков
-    lemma = lemma_generator(total_list)
-    already_found_lemmas.add(lemma)
-    for lemma in already_found_lemmas:
-        # тут у меня не строка, а генератор...
-        if lemma  in constr[1][0]:
+# генератор берет список списков
+for lemmas_info in list(lemma_generator(total_list)):
+    lemma = lemmas_info[0]
+    # print(lemmas_info)
+    freq = int(lemmas_info[1])
+    summary += freq
+    if float(summary)/ total >= 0.8:
+        break
+    # log(lemma,'lemma after generator')
+    if lemma not in already_found_lemmas:
+        already_found_lemmas.add(lemma)
+        # log(already_found_lemmas)
+        # открываю файл с конструкциями и леммами
+        constrs = open('CONSTRS.csv', 'r')
+        for constr in constrs:
+            constr, lemmas = constr.split(" ;")
+            lemmas = eval(lemmas)
+            # это строка, тут по индексам будут только буквы
+            # log(constr,'constr')
+            constr_ok = True
+            for constr_lemma in lemmas[0]:
+                if constr_lemma not in  already_found_lemmas:
+                    constr_ok = False
+                    break
+            if constr_ok and constr not in constr_set:
+                # log(lemma,'lemma')
+                constr_set.append(constr)
+                final_list_constr.write(constr + '\n')
+                print(constr)
             # yield lemma
-            log(lemma,'lemma')
         # yield constr[0]
-        log(constr[0],'constr')
-            
-
-            
-
+# не забудь закрыть файл        
+final_list_constr.close()   
