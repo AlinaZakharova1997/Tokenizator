@@ -87,6 +87,8 @@ for filename in os.listdir(os.getcwd()):
 already_found_lemmas = set()
 # множество конструкций, в которые вошли все леммы из множества лемм
 constr_set = list()
+# множество лемм, которые я буду обрабатывать в онтологии
+lemmas_for_ontology = set()
 # результирующий файл со списком конструкций
 final_list_constr = open("fina_list_constr.txt", "w")
 # финальный список лемм, которые надо проверить в онтологии
@@ -108,8 +110,7 @@ for lemmas_info in list(lemma_generator(total_list)):
     # log(lemma,'lemma after generator')
     if lemma not in already_found_lemmas:
         already_found_lemmas.add(lemma)
-        final_list_of_lemmas.write(lemma + '\n' )
-        log(final_list_of_lemmas)
+        
         # print(lemma)
         # открываю файл с конструкциями и леммами
         constrs = open('CONSTRS.csv', 'r')
@@ -124,15 +125,19 @@ for lemmas_info in list(lemma_generator(total_list)):
                     constr_ok = False
                     break
             if constr_ok and constr not in constr_set:
+                for constr_lemma in lemmas[0]:
+                    if constr_lemma not in lemmas_for_ontology:
+                        lemmas_for_ontology.add(constr_lemma)
+                        final_list_of_lemmas.write(constr_lemma + '\n' )
+                        print(constr_lemma,'constr_lemma')
                 # log(lemma,'lemma')
                 constr_set.append(constr)
                 final_list_constr.write(constr + '\n')
-                # print(constr)
-            # yield lemma
-        # yield constr[0]
+    
 # не забудь закрыть файл        
 final_list_constr.close()        
 final_list_of_lemmas.close()        
             
 
+   
       
