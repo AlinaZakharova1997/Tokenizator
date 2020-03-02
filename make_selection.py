@@ -56,7 +56,7 @@ for filename in os.listdir(os.getcwd()):
     # список всех троек лемма-частота-тег для каждого файла
     dictlist = []
     # тк перебираются все файлы, включая данный, ставлю проверку на нужные файлы, те файлы csv
-    if not filename.endswith('Total.csv'):
+    if not filename.endswith('_1.csv'):
         continue
     file = open(filename, 'r')
     # считываю содержимое файла как словарь, учитывая разделитель
@@ -82,16 +82,20 @@ for filename in os.listdir(os.getcwd()):
 
 
 
+
 # множество пройденных лемм            
 already_found_lemmas = set()
 # множество конструкций, в которые вошли все леммы из множества лемм
 constr_set = list()
 # результирующий файл со списком конструкций
 final_list_constr = open("fina_list_constr.txt", "w")
+# финальный список лемм, которые надо проверить в онтологии
+final_list_of_lemmas = open("lina_lemmas_list","w")
 # сумма частот в процессе генерации лемм
 summary = 0
 # общая сумма всех частот по всем частям речи
-total = 122377
+# total = 122377
+total = 117483
 # начало цикла по генератору
 # генератор берет список списков
 for lemmas_info in list(lemma_generator(total_list)):
@@ -104,7 +108,9 @@ for lemmas_info in list(lemma_generator(total_list)):
     # log(lemma,'lemma after generator')
     if lemma not in already_found_lemmas:
         already_found_lemmas.add(lemma)
-        # log(already_found_lemmas)
+        final_list_of_lemmas.write(lemma + '\n' )
+        log(final_list_of_lemmas)
+        # print(lemma)
         # открываю файл с конструкциями и леммами
         constrs = open('CONSTRS.csv', 'r')
         for constr in constrs:
@@ -121,8 +127,12 @@ for lemmas_info in list(lemma_generator(total_list)):
                 # log(lemma,'lemma')
                 constr_set.append(constr)
                 final_list_constr.write(constr + '\n')
-                print(constr)
+                # print(constr)
             # yield lemma
         # yield constr[0]
 # не забудь закрыть файл        
-final_list_constr.close()   
+final_list_constr.close()        
+final_list_of_lemmas.close()        
+            
+
+      
