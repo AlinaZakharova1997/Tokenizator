@@ -92,7 +92,11 @@ lemmas_for_ontology = set()
 # результирующий файл со списком конструкций
 final_list_constr = open("fina_list_constr.txt", "w")
 # финальный список лемм, которые надо проверить в онтологии
-final_list_of_lemmas = open("lina_lemmas_list","w")
+final_list_of_lemmas = open("lina_lemmas_list.txt","w")
+# стоп список неправильных конструкций
+# по результатам первого прогона этого кода
+# их мы будем исключать из выборки 
+# stop_constr_list = open("stop_constr_list.txt","r")
 # сумма частот в процессе генерации лемм
 summary = 0
 # общая сумма всех частот по всем частям речи
@@ -110,33 +114,35 @@ for lemmas_info in list(lemma_generator(total_list)):
     # log(lemma,'lemma after generator')
     if lemma not in already_found_lemmas:
         already_found_lemmas.add(lemma)
-        
         # print(lemma)
         # открываю файл с конструкциями и леммами
         constrs = open('CONSTRS.csv', 'r')
+        stop_constr_list = open("stop_constr_list.txt","r")
         for constr in constrs:
-            constr, lemmas = constr.split(" ;")
-            lemmas = eval(lemmas)
-            # это строка, тут по индексам будут только буквы
-            # log(constr,'constr')
-            constr_ok = True
-            for constr_lemma in lemmas[0]:
-                if constr_lemma not in  already_found_lemmas:
-                    constr_ok = False
-                    break
-            if constr_ok and constr not in constr_set:
+            if constr not in stop_constr_list:
+                constr, lemmas = constr.split(" ;")
+                lemmas = eval(lemmas)
+                # это строка, тут по индексам будут только буквы
+                # log(constr,'constr')
+                constr_ok = True
                 for constr_lemma in lemmas[0]:
-                    if constr_lemma not in lemmas_for_ontology:
-                        lemmas_for_ontology.add(constr_lemma)
-                        final_list_of_lemmas.write(constr_lemma + '\n' )
-                        print(constr_lemma,'constr_lemma')
-                # log(lemma,'lemma')
-                constr_set.append(constr)
-                final_list_constr.write(constr + '\n')
+                    if constr_lemma not in  already_found_lemmas:
+                        constr_ok = False
+                        break
+                if constr_ok and constr not in constr_set:
+                    for constr_lemma in lemmas[0]:
+                        if constr_lemma not in lemmas_for_ontology:
+                            lemmas_for_ontology.add(constr_lemma)
+                            final_list_of_lemmas.write(constr_lemma + '\n' )
+                            print(constr_lemma,'constr_lemma')
+                        # log(lemma,'lemma')
+                        constr_set.append(constr)
+                        final_list_constr.write(constr + '\n')
     
 # не забудь закрыть файл        
 final_list_constr.close()        
 final_list_of_lemmas.close()        
+stop_constr_list.close()            
             
 
    
